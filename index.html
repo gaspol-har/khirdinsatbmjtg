@@ -17,7 +17,22 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--light);color:va
 
 .header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,#1a3060 100%);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.4)}
 .header-inner{display:flex;align-items:center;gap:16px;padding:14px 28px;border-bottom:2.5px solid var(--gold)}
-.logo-emblem{width:52px;height:52px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--navy);border:3px solid rgba(255,255,255,.3);flex-shrink:0}
+.logo-emblem{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+
+.logo-emblem img{
+    width:70%;
+    height:70%;
+    object-fit:contain;
+}
 .header-titles h1{font-family:'DM Serif Display',serif;font-size:18px;color:#fff;letter-spacing:.3px}
 .header-titles p{font-size:12px;color:rgba(255,255,255,.65);margin-top:2px;font-weight:500}
 .nav{display:flex;gap:2px;padding:0 24px;background:var(--navy);overflow-x:auto}
@@ -103,8 +118,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--light);color:va
 
 <div class="header">
   <div class="header-inner">
-  <div class="logo-emblem">
-    <img src="korps-brimob-seeklogo.png" alt="Logo Brimob" width="120">
+ <div class="logo-emblem">
+    <img src="korps-brimob-seeklogo.png" alt="Logo Brimob">
 </div>
     <div class="header-titles">
       <h1>Khirdin Satbrimob Polda Jateng</h1>
