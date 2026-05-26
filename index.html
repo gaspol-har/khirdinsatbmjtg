@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khirdin Satbrimob Polda Jateng</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#0A1628;--navy2:#132040;--gold:#C9A227;--gold-light:#E8C64A;
+  --blue:#1E5FAD;--light:#F4F6FA;--white:#ffffff;
+  --text:#0A1628;--text-mid:#3D4F6E;--text-muted:#7A8BA6;
+  --border:#D8E2F0;--success:#1B7A4E;
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--light);color:var(--text);min-height:100vh}
+
+.header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,#1a3060 100%);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.4)}
+.header-inner{display:flex;align-items:center;gap:16px;padding:14px 28px;border-bottom:2.5px solid var(--gold)}
+.logo-emblem{width:52px;height:52px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--navy);border:3px solid rgba(255,255,255,.3);flex-shrink:0}
+.header-titles h1{font-family:'DM Serif Display',serif;font-size:18px;color:#fff;letter-spacing:.3px}
+.header-titles p{font-size:12px;color:rgba(255,255,255,.65);margin-top:2px;font-weight:500}
+.nav{display:flex;gap:2px;padding:0 24px;background:var(--navy);overflow-x:auto}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{background:none;border:none;color:rgba(255,255,255,.7);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;padding:10px 16px;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+.nav-btn:hover{color:#fff;background:rgba(255,255,255,.07)}
+.nav-btn.active{color:var(--gold-light);border-bottom-color:var(--gold);background:rgba(201,162,39,.1)}
+
+.main{max-width:980px;margin:0 auto;padding:28px 20px}
+
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 100%);border-radius:14px;padding:28px 32px;margin-bottom:24px;display:flex;align-items:center;gap:20px;border:1px solid rgba(201,162,39,.3)}
+.hero-text h2{font-family:'DM Serif Display',serif;font-size:22px;color:#fff;margin-bottom:6px}
+.hero-text p{font-size:13px;color:rgba(255,255,255,.7);line-height:1.6}
+.hero-icon{font-size:52px;flex-shrink:0}
+
+.page{display:none}
+.page.active{display:block}
+
+.tab-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.tab-pill{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:7px 16px;font-size:12.5px;font-weight:600;color:var(--text-mid);cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif}
+.tab-pill.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.tab-pill:hover:not(.active){background:#EEF4FF;border-color:var(--blue);color:var(--blue)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+.berkas-card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:0 2px 8px rgba(10,22,40,.06);margin-bottom:0}
+.card-head{padding:14px 18px;display:flex;align-items:center;gap:10px}
+.card-head.blue{background:linear-gradient(135deg,#0F3D7A,#1E5FAD)}
+.card-head.gold{background:linear-gradient(135deg,#7A4F08,#B87A10)}
+.card-head.teal{background:linear-gradient(135deg,#085041,#0F6E56)}
+.card-head.red{background:linear-gradient(135deg,#7A1515,#A32D2D)}
+.card-head.purple{background:linear-gradient(135deg,#2E1B6E,#534AB7)}
+.card-head-icon{font-size:22px}
+.card-head h4{font-size:13px;font-weight:700;color:#fff}
+.card-head p{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
+.card-body{padding:16px 18px}
+.berkas-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border)}
+.berkas-item:last-child{border-bottom:none}
+.item-num{font-size:11px;font-weight:700;color:var(--gold);min-width:22px;margin-top:2px;flex-shrink:0}
+.item-text{font-size:13px;color:var(--text-mid);line-height:1.45;flex:1}
+
+/* Download bar — attached to bottom of card */
+.card-wrap{margin-bottom:20px;border-radius:12px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 8px rgba(10,22,40,.06)}
+.card-wrap .berkas-card{border-radius:0;border:none;box-shadow:none;margin-bottom:0}
+.card-wrap .card-head{border-radius:0}
+.download-bar{background:#F7F9FF;border-top:2px solid var(--gold);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.download-label{font-size:12.5px;color:var(--text-mid)}
+.download-label strong{color:var(--navy);font-size:13px}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap}
+.print-btn{display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--navy);border:1.5px solid var(--border);padding:9px 16px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s}
+.print-btn:hover{border-color:var(--blue);color:var(--blue);background:#EEF4FF}
+.download-btn{display:inline-flex;align-items:center;gap:7px;background:var(--navy);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;transition:opacity .2s}
+.download-btn:hover{opacity:.85}
+
+/* Sub-section header inside card (for tewas multi-section) */
+.sub-section-head{background:#f0f4fc;border-top:1px solid var(--border);padding:10px 18px;font-size:12px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px}
+.sub-section-head.teal-sub{background:#e8f7f3;border-top-color:#9FE1CB;color:#085041}
+
+/* FORMS PAGE */
+.forms-intro{font-size:13.5px;color:var(--text-mid);margin-bottom:20px;line-height:1.7;background:#fff;border-radius:10px;border:1px solid var(--border);padding:16px 20px}
+.forms-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:24px}
+.form-card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:0 2px 8px rgba(10,22,40,.06);display:flex;flex-direction:column}
+.form-card-head{background:linear-gradient(135deg,var(--navy),var(--blue));padding:14px 18px}
+.form-card-head h4{font-size:13.5px;font-weight:700;color:#fff}
+.form-card-head p{font-size:11.5px;color:rgba(255,255,255,.65);margin-top:3px;line-height:1.4}
+.form-card-body{padding:14px 18px;flex:1;display:flex;flex-direction:column;justify-content:flex-end}
+.form-dl-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:var(--navy);text-decoration:none;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;transition:opacity .2s;margin-top:10px}
+.form-dl-btn:hover{opacity:.85}
+.form-dl-btn.disabled{background:var(--border);color:var(--text-muted);cursor:default;pointer-events:none}
+
+.footer{text-align:center;padding:20px;color:var(--text-muted);font-size:12px;border-top:1px solid var(--border);margin-top:16px}
+
+@media(max-width:600px){
+  .header-inner{padding:12px 16px}
+  .main{padding:16px 12px}
+  .hero{flex-direction:column;padding:20px;text-align:center}
+  .hero-icon{font-size:36px}
+  .download-bar{flex-direction:column;align-items:stretch}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-emblem">⚜</div>
+    <div class="header-titles">
+      <h1>Khirdin Satbrimob Polda Jateng</h1>
+      <p>Sistem Informasi Kelengkapan Berkas Administrasi</p>
+    </div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showPage('berkas',this)">📋 Persyaratan Berkas</button>
+    <button class="nav-btn" onclick="showPage('forms',this)">📥 Unduh Formulir</button>
+  </nav>
+</div>
+
+<div class="main">
+
+  <div class="hero">
+    <div class="hero-text">
+      <h2>Panduan Kelengkapan Berkas</h2>
+      <p>Lihat persyaratan dokumen administrasi pensiun, tewas, warakawuri, dan layanan lainnya.<br>
+      Unduh atau cetak ceklis kelengkapan berkas untuk memudahkan persiapan dokumen.</p>
+    </div>
+    <div class="hero-icon">🛡️</div>
+  </div>
+
+  <!-- PAGE: BERKAS -->
+  <div class="page active" id="page-berkas">
+    <div class="tab-row">
+      <button class="tab-pill active" onclick="showTab('pensiun-polda',this)">Pensiun Polda</button>
+      <button class="tab-pill" onclick="showTab('pensiun-asabri',this)">Pensiun Asabri</button>
+      <button class="tab-pill" onclick="showTab('md-aktif',this)">MD Aktif Asabri</button>
+      <button class="tab-pill" onclick="showTab('catur-sakti',this)">Catur Sakti Polda</button>
+      <button class="tab-pill" onclick="showTab('warakawuri-polda',this)">Warakawuri Polda</button>
+      <button class="tab-pill" onclick="showTab('warakawuri-asabri',this)">Warakawuri Asabri</button>
+      <button class="tab-pill" onclick="showTab('tewas-polda',this)">Tewas Polda</button>
+      <button class="tab-pill" onclick="showTab('tewas-asabri',this)">Tewas Asabri</button>
+      <button class="tab-pill" onclick="showTab('pum-asabri',this)">PUM Asabri</button>
+    </div>
+    <div id="tab-pensiun-polda" class="tab-content active"></div>
+    <div id="tab-pensiun-asabri" class="tab-content"></div>
+    <div id="tab-md-aktif" class="tab-content"></div>
+    <div id="tab-catur-sakti" class="tab-content"></div>
+    <div id="tab-warakawuri-polda" class="tab-content"></div>
+    <div id="tab-warakawuri-asabri" class="tab-content"></div>
+    <div id="tab-tewas-polda" class="tab-content"></div>
+    <div id="tab-tewas-asabri" class="tab-content"></div>
+    <div id="tab-pum-asabri" class="tab-content"></div>
+  </div>
+
+  <!-- PAGE: FORMULIR -->
+  <div class="page" id="page-forms">
+    <div class="forms-intro">
+      📂 Klik tombol <strong>Unduh Formulir</strong> pada masing-masing kartu untuk mengunduh file dari Google Drive.
+      Hubungi admin jika tautan tidak dapat diakses.
+    </div>
+    <div class="forms-grid" id="forms-grid"></div>
+  </div>
+
+</div>
+
+<div class="footer">
+  &copy; 2025 Khirdin Satbrimob Polda Jateng &nbsp;|&nbsp; Sistem Informasi Administrasi Internal
+</div>
+
+<script>
+// ─── DATA BERKAS ─────────────────────────────────────────────────────────────
+const BERKAS = {
+  'pensiun-polda': {
+    label: 'Ceklis Pensiun POLDA', color: 'blue', icon: '🪪',
+    items: [
+      'Daftar Riwayat Hidup',
+      'FC. Skep Pengangkatan Pertama',
+      'FC. Skep Pangkat Terakhir',
+      'FC. Skep Gaji Berkala',
+      'FC. Kartu ASABRI',
+      'FC. Kartu NPWP',
+      'Perincian Gaji Terakhir',
+      'Daftar Susunan Keluarga',
+      'FC Surat Nikah / Buku Nikah (Legalisir Dukcapil)',
+      'FC KPI',
+      'FC Akte Kelahiran Anak Tertanggung',
+      'Surat Pernyataan Penunjukan Alamat Pensiun',
+      'FC. KTP',
+      'FC. KK (Legalisir jika belum barcode)',
+      'FC. Bintang Bhayangkara Nararya',
+      'Pas Foto Suami dan Istri 10 Lembar'
+    ]
+  },
+  'pensiun-asabri': {
+    label: 'Ceklis Pensiun ASABRI', color: 'gold', icon: '🏦',
+    items: [
+      'Formulir Pengajuan',
+      'Formulir SP3R',
+      'Formulir TDS',
+      'Asli Salinan Kep Pensiun',
+      'FC. Kep Pengangkatan Pertama',
+      'Asli SKPP dari KPPN',
+      'Asli RHS (Riwayat Hidup Singkat)',
+      'Asli Suket Kuliah (bagi anak usia 21–25 tahun yang masih kuliah)',
+      'FC. E-KTP',
+      'FC. KK',
+      'FC. Surat Nikah / Buku Nikah (Legalisir Dukcapil)',
+      'FC. NPWP',
+      'FC. Buku Rekening',
+      'Pas Foto Suami dan Istri 10 Lembar'
+    ]
+  },
+  'md-aktif': {
+    label: 'Ceklis MD Aktif ke ASABRI', color: 'teal', icon: '📋',
+    items: [
+      'Form Pengajuan',
+      'Form SP3R',
+      'Form TPB',
+      'Asli RHS (Riwayat Hidup Singkat)',
+      'Asli Sket Ahli Waris (disahkan Lurah / Kepala Desa)',
+      'Asli Surat Keterangan Sekolah',
+      'FC Legalisir Kep PDH MD',
+      'FC Kep Pertama',
+      'FC Akta Kematian',
+      'FC DPP Gaji KU-107',
+      'FC E-KTP',
+      'FC KK',
+      'FC Surat Nikah / Buku Nikah (Legalisir Dukcapil)',
+      'FC Buku Rekening'
+    ]
+  },
+  'catur-sakti': {
+    label: 'Ceklis Catur Sakti POLDA', color: 'purple', icon: '📜',
+    items: [
+      'Permohonan dari Ahli Waris',
+      'FC Surat Kematian / Akte Kematian',
+      'FC Skep Pertama',
+      'FC Skep Pangkat Terakhir',
+      'FC Skep Gaji Terakhir',
+      'FC KTA (Kartu Tanda Anggota)'
+    ]
+  },
+  'warakawuri-polda': {
+    label: 'Ceklis Warakawuri POLDA', color: 'blue', icon: '👩‍👧',
+    items: [
+      'Surat Usulan Permohonan dari Kasatker',
+      'Surat Permohonan Usulan Siun Wari dari YBS',
+      'Daftar Keluarga Penerima Tunjangan (KU-1)',
+      'FC. Kep Pengangkatan Pertama menjadi Polisi',
+      'FC. Kep Pangkat Terakhir',
+      'FC. Kep Berkala Terakhir',
+      'FC. Kep MD',
+      'Surat Kematian dari Kelurahan / Rumah Sakit',
+      'FC. KPI',
+      'FC. Akte Nikah / Buku Nikah (Legalisir KUA / Disdukcapil)',
+      'FC. KTP (Legalisir Disdukcapil jika belum E-KTP)',
+      'FC. KK (Legalisir Disdukcapil jika belum barcode)',
+      'Rincian Gaji Terakhir',
+      'FC. Bintang Bhayangkara Nararya (bila punya)',
+      'Surat Keterangan Alamat Pensiun',
+      'Surat Keterangan YBS Belum Menikah Lagi (dari Kelurahan)',
+      'Pas Foto Berwarna Ukuran 4×6 sebanyak 10 Lembar'
+    ]
+  },
+  'warakawuri-asabri': {
+    label: 'Ceklis Warakawuri ASABRI', color: 'gold', icon: '👩‍👧',
+    items: [
+      'Form Pengajuan',
+      'SK Wari Salinan',
+      'SKPP dari KPPN',
+      'FC Akta Kematian Legalisir Dukcapil',
+      'FC Buku Nikah (Legalisir KUA)',
+      'FC KTP',
+      'FC KK',
+      'FC Buku Tabungan',
+      'Suket Kuliah jika anak masih kuliah usia 21 tahun ke atas',
+      'Form SP3R',
+      'Surat Keterangan Kejandaan dari Kelurahan',
+      'Pas Foto 4×6 sebanyak 10 Lembar'
+    ]
+  },
+  'tewas-polda': {
+    label: 'Ceklis Tewas ke POLDA', color: 'red', icon: '⚠️',
+    items: [
+      'Surat Usulan',
+      'Laporan Kronologi',
+      'Sprin (Surat Perintah)',
+      'Foto Kejadian',
+      'LP (Laporan Polisi)',
+      'Skep Pertama',
+      'Sket Ahli Waris',
+      'Skep Jabatan Terakhir',
+      'Skep Terakhir',
+      'Kartu ASABRI',
+      'Kartu Keluarga (KK)',
+      'Visum dari Dokter / Rumah Sakit',
+      'Surat Nikah & KPI',
+      'Surat Keterangan Kematian',
+      'KTA (Kartu Tanda Anggota)'
+    ]
+  },
+  'tewas-asabri': {
+    label: 'Ceklis Tewas ke ASABRI', color: 'red', icon: '⚠️',
+    sections: [
+      {
+        subtitle: 'Tewas (Umum)',
+        color: 'red',
+        items: [
+          'Form Pengajuan',
+          'SP3R',
+          'Asli Suket Ahli Waris (disahkan Lurah / Kepala Desa)',
+          'Asli RHS (Riwayat Hidup Singkat)',
+          'Asli Surat Keterangan Sekolah / Kuliah',
+          'FC Legalisir Kep Gugur / Tewas',
+          'FC Kep Pangkat Pertama',
+          'FC Akta Kematian Dukcapil',
+          'FC Legalisir DPP Gaji KU-107',
+          'FC E-KTP',
+          'FC KK',
+          'FC Surat Nikah / Buku Nikah',
+          'FC Buku Tabungan',
+          'FC Legalisir Sprin Tugas',
+          'FC Kronologis Kejadian',
+          'FC Resume Medis / Hasil Pemeriksaan Medis'
+        ]
+      },
+      {
+        subtitle: 'Tewas Belum Menikah (Masih Ada Orang Tua Kandung)',
+        color: 'teal',
+        items: [
+          'Formulir Pengajuan',
+          'Asli dan Salinan Kep Pensiun',
+          'Asli SKPP dari KPPN',
+          'Pas Foto Pengaju Ukuran 4×6 sebanyak 2 Lembar'
+        ]
+      }
+    ]
+  },
+  'pum-asabri': {
+    label: 'Ceklis PUM ASABRI', color: 'gold', icon: '🧾',
+    items: [
+      'Surat Usulan Permohonan dari Kasatker',
+      'Surat Permohonan Usulan Siun Wari dari YBS',
+      'Daftar Keluarga Penerima Tunjangan (KU-1)',
+      'FC. Kep Pengangkatan Pertama menjadi Polisi',
+      'FC. Kep Pangkat Terakhir',
+      'FC. Kep Berkala Terakhir',
+      'FC. Kep MD',
+      'Surat Kematian dari Kelurahan / Rumah Sakit',
+      'FC. KPI',
+      'FC. Akte Nikah / Buku Nikah (Legalisir KUA / Disdukcapil)',
+      'FC. KTP (Legalisir Disdukcapil jika belum E-KTP)',
+      'FC. KK (Legalisir Disdukcapil jika belum barcode)',
+      'Rincian Gaji Terakhir',
+      'FC. Bintang Bhayangkara Nararya (bila punya)',
+      'Surat Keterangan Alamat Pensiun',
+      'Surat Keterangan YBS Belum Menikah Lagi (dari Kelurahan)',
+      'Pas Foto Berwarna Ukuran 4×6 sebanyak 10 Lembar'
+    ]
+  }
+};
+
+// ─── DATA FORMULIR — ISI href DENGAN LINK GOOGLE DRIVE ANDA ─────────────────
+const FORMS = [
+  {
+    label: 'Form SP3R Asabri',
+    desc: 'Surat Pengajuan Pembayaran Pensiun Pertama ASABRI',
+    href: '' // ← tautkan link Google Drive di sini
+  },
+  {
+    label: 'Form Pengajuan Asabri',
+    desc: 'Formulir Pengajuan Klaim / Layanan ASABRI',
+    href: '' // ← tautkan link Google Drive di sini
+  },
+  {
+    label: 'Form TDS',
+    desc: 'Formulir Tunjangan Duka Sejahtera',
+    href: '' // ← tautkan link Google Drive di sini
+  },
+  {
+    label: 'Form TPB',
+    desc: 'Formulir Tabungan Perumahan / Pinjaman Berbantuan',
+    href: '' // ← tautkan link Google Drive di sini
+  },
+  {
+    label: 'Surat Pernyataan Belum Menikah Lagi',
+    desc: 'Surat keterangan dari Kelurahan bahwa yang bersangkutan belum menikah lagi',
+    href: '' // ← tautkan link Google Drive di sini
+  },
+  {
+    label: 'Surat Keterangan Ahli Waris',
+    desc: 'Surat keterangan susunan ahli waris yang disahkan oleh Lurah / Kepala Desa',
+    href: '' // ← tautkan link Google Drive di sini
+  }
+];
+
+// ─── RENDER BERKAS ────────────────────────────────────────────────────────────
+function buildAllBerkas() {
+  for (const [tabKey, data] of Object.entries(BERKAS)) {
+    const container = document.getElementById('tab-' + tabKey);
+    if (!container) continue;
+
+    let allItems = [];
+    let innerHtml = '';
+
+    if (data.sections) {
+      data.sections.forEach((sec, si) => {
+        allItems = allItems.concat(sec.items);
+        const isFirst = si === 0;
+        const itemsHtml = sec.items.map((item, i) =>
+          `<div class="berkas-item">
+            <span class="item-num">${i + 1}</span>
+            <span class="item-text">${item}</span>
+          </div>`
+        ).join('');
+
+        if (isFirst) {
+          innerHtml += `<div class="card-head ${data.color}">
+            <span class="card-head-icon">${data.icon}</span>
+            <div><h4>${data.label}</h4><p>${data.sections.reduce((a,s)=>a+s.items.length,0)} berkas diperlukan</p></div>
+          </div>`;
+        }
+        innerHtml += `<div class="sub-section-head ${sec.color === 'teal' ? 'teal-sub' : ''}">
+          ${sec.color === 'teal' ? '📌' : '📍'} ${sec.subtitle}
+        </div>
+        <div class="card-body">${itemsHtml}</div>`;
+      });
+    } else {
+      allItems = data.items;
+      const itemsHtml = data.items.map((item, i) =>
+        `<div class="berkas-item">
+          <span class="item-num">${i + 1}</span>
+          <span class="item-text">${item}</span>
+        </div>`
+      ).join('');
+      innerHtml = `<div class="card-head ${data.color}">
+        <span class="card-head-icon">${data.icon}</span>
+        <div><h4>${data.label}</h4><p>${data.items.length} berkas diperlukan</p></div>
+      </div>
+      <div class="card-body">${itemsHtml}</div>`;
+    }
+
+    container.innerHTML = `
+      <div class="card-wrap">
+        <div class="berkas-card">${innerHtml}</div>
+        <div class="download-bar">
+          <div class="download-label">
+            <strong>${data.label}</strong><br>
+            Unduh atau cetak daftar ceklis kelengkapan berkas ini
+          </div>
+          <div class="btn-group">
+            <button class="print-btn" onclick="printChecklist('${tabKey}')">🖨️ Cetak</button>
+            <button class="download-btn" onclick="printChecklist('${tabKey}')">⬇️ Unduh Ceklis PDF</button>
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+// ─── RENDER FORMULIR ──────────────────────────────────────────────────────────
+function buildForms() {
+  document.getElementById('forms-grid').innerHTML = FORMS.map(f => {
+    const hasLink = f.href && f.href.trim() !== '';
+    return `
+    <div class="form-card">
+      <div class="form-card-head">
+        <h4>${f.label}</h4>
+        <p>${f.desc}</p>
+      </div>
+      <div class="form-card-body">
+        ${hasLink
+          ? `<a class="form-dl-btn" href="${f.href}" target="_blank" rel="noopener">⬇️ Unduh Formulir</a>`
+          : `<a class="form-dl-btn disabled" href="#" onclick="return false">⏳ Segera Tersedia</a>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── PRINT / PDF ──────────────────────────────────────────────────────────────
+function printChecklist(tabKey) {
+  const data = BERKAS[tabKey];
+  if (!data) return;
+  const today = new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
+
+  let sectionsHtml = '';
+  if (data.sections) {
+    data.sections.forEach(sec => {
+      sectionsHtml += `<h3 style="font-size:11.5pt;margin:14pt 0 6pt;color:#0A1628;border-left:3pt solid #C9A227;padding-left:8pt">${sec.subtitle}</h3>`;
+      sectionsHtml += buildPrintTable(sec.items);
+    });
+  } else {
+    sectionsHtml = buildPrintTable(data.items);
+  }
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html lang="id"><head>
+  <meta charset="UTF-8">
+  <title>${data.label} — Khirdin Satbrimob Polda Jateng</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;padding:28pt 36pt;color:#222;font-size:10.5pt}
+    .kop{display:flex;align-items:center;gap:14pt;padding-bottom:10pt;border-bottom:3pt solid #0A1628;margin-bottom:6pt}
+    .emblem{width:44pt;height:44pt;border-radius:50%;background:#C9A227;display:flex;align-items:center;justify-content:center;font-size:18pt;font-weight:700;color:#0A1628;border:2pt solid #0A1628;flex-shrink:0}
+    .kop-text h1{font-size:13.5pt;font-weight:700;color:#0A1628}
+    .kop-text p{font-size:9.5pt;color:#555;margin-top:2pt}
+    .doc-title{font-size:14pt;font-weight:700;color:#0A1628;margin:12pt 0 4pt}
+    .doc-sub{font-size:9pt;color:#777;margin-bottom:14pt}
+    table{width:100%;border-collapse:collapse}
+    thead tr{background:#0A1628;color:#fff;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+    thead th{padding:6pt 5pt;font-size:9pt;text-align:left}
+    thead th.center{text-align:center}
+    tbody tr:nth-child(even){background:#F4F6FA;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+    tbody td{padding:6pt 5pt;font-size:10pt;vertical-align:middle;border-bottom:0.5pt solid #ddd}
+    .no{width:24pt;text-align:center;font-weight:700;color:#B87A10}
+    .chk{width:28pt;text-align:center}
+    .chkbox{width:14pt;height:14pt;border:1.5pt solid #555;border-radius:2pt;display:inline-block;margin:0 auto}
+    .footer{margin-top:20pt;padding-top:10pt;border-top:0.5pt solid #ccc;display:flex;justify-content:space-between;font-size:8.5pt;color:#888}
+    @media print{body{padding:16pt 24pt}}
+  </style>
+  </head><body>
+  <div class="kop">
+    <div class="emblem">⚜</div>
+    <div class="kop-text">
+      <h1>Khirdin Satbrimob Polda Jateng</h1>
+      <p>Sistem Informasi Administrasi Internal &nbsp;|&nbsp; Tanggal cetak: ${today}</p>
+    </div>
+  </div>
+  <div class="doc-title">${data.label}</div>
+  <div class="doc-sub">Harap lengkapi seluruh berkas berikut sebelum diserahkan kepada petugas administrasi.</div>
+  ${sectionsHtml}
+  <div class="footer">
+    <span>Khirdin Satbrimob Polda Jateng</span>
+    <span>Dicetak: ${today}</span>
+  </div>
+  <script>window.onload = () => window.print();<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
+function buildPrintTable(items) {
+  const rows = items.map((item, i) => `
+    <tr>
+      <td class="no">${i + 1}</td>
+      <td>${item}</td>
+      <td class="chk"><div class="chkbox"></div></td>
+      <td class="chk"><div class="chkbox"></div></td>
+    </tr>`).join('');
+  return `
+  <table style="margin-bottom:10pt">
+    <thead>
+      <tr>
+        <th class="center" style="width:24pt">No</th>
+        <th>Nama Berkas / Dokumen</th>
+        <th class="center" style="width:28pt">Ada</th>
+        <th class="center" style="width:28pt">Tidak</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// ─── NAVIGASI ──────────────────────────────────────────────────────────────────
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-pill').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+buildAllBerkas();
+buildForms();
+</script>
+</body>
+</html>
