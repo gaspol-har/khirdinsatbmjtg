@@ -73,6 +73,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--light);color:va
 .berkas-item:last-child{border-bottom:none}
 .item-num{font-size:11px;font-weight:700;color:var(--gold);min-width:22px;margin-top:2px;flex-shrink:0}
 .item-text{font-size:13px;color:var(--text-mid);line-height:1.45;flex:1}
+.berkas-item.has-form{background:#F7FAFF;margin:0 -8px;padding:8px;border-radius:6px}
+.item-link{font-size:13px;color:var(--blue);line-height:1.45;flex:1;text-decoration:none;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.item-link:hover .item-link-label{text-decoration:underline}
+.item-link:hover .dl-chip{background:var(--gold);color:var(--navy)}
+.item-link-label{color:var(--navy);font-weight:600}
+.dl-chip{font-size:10.5px;font-weight:700;color:#fff;background:var(--blue);padding:3px 9px;border-radius:12px;white-space:nowrap;flex-shrink:0;transition:all .15s}
 
 /* Download bar — attached to bottom of card */
 .card-wrap{margin-bottom:20px;border-radius:12px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 8px rgba(10,22,40,.06)}
@@ -421,6 +427,47 @@ const FORMS = [
   }
 ];
 
+// ─── PENCOCOKAN ITEM BERKAS ↔ FORMULIR ────────────────────────────────────────
+// Mencocokkan teks item pada daftar persyaratan berkas dengan salah satu
+// formulir di FORMS (berdasarkan label), lalu mengembalikan objek form-nya
+// (atau null jika item tsb bukan salah satu dari 8 formulir target).
+function matchForm(itemText) {
+  const t = itemText.trim();
+  const byLabel = (label) => FORMS.find(f => f.label === label);
+
+  if (/SP3R/i.test(t)) return byLabel('Form SP3R Asabri');
+  if (/^(Formulir|Form)\s+Pengajuan$/i.test(t)) return byLabel('Form Pengajuan Asabri');
+  if (/\bTDS\b/i.test(t)) return byLabel('Form TDS');
+  if (/\bTPB\b/i.test(t)) return byLabel('Form TPB');
+  if (/Belum Menikah Lagi/i.test(t)) return byLabel('Surat Pernyataan Belum Menikah Lagi');
+  if (/KU[\s-]?1/i.test(t) && /Keluarga|Tunjangan/i.test(t)) return byLabel('Surat KU 1');
+  if (/Alamat Pensiun/i.test(t)) return byLabel('Surat Penunjukan Alamat Pensiun');
+  if (/(Sket|Suket|Keterangan)\s+Ahli\s+Waris/i.test(t) || /Permohonan\s+(dari\s+)?Ahli\s+Waris/i.test(t)) return byLabel('Surat Keterangan Ahli Waris');
+  return null;
+}
+
+// Render satu baris item berkas. Jika teksnya cocok dengan salah satu
+// formulir di FORMS dan link-nya terisi, tampilkan sebagai tombol/tautan
+// unduh langsung. Jika tidak cocok, tampilkan sebagai teks biasa seperti semula.
+function renderBerkasItem(item, i) {
+  const form = matchForm(item);
+  const hasLink = form && form.href && form.href.trim() !== '';
+
+  if (hasLink) {
+    return `<div class="berkas-item has-form">
+      <span class="item-num">${i + 1}</span>
+      <a class="item-link" href="${form.href}" target="_blank" rel="noopener" title="Unduh ${form.label}">
+        <span class="item-link-label">${item}</span>
+        <span class="dl-chip">⬇️ Unduh</span>
+      </a>
+    </div>`;
+  }
+  return `<div class="berkas-item">
+    <span class="item-num">${i + 1}</span>
+    <span class="item-text">${item}</span>
+  </div>`;
+}
+
 // ─── RENDER BERKAS ────────────────────────────────────────────────────────────
 function buildAllBerkas() {
   for (const [tabKey, data] of Object.entries(BERKAS)) {
@@ -434,12 +481,7 @@ function buildAllBerkas() {
       data.sections.forEach((sec, si) => {
         allItems = allItems.concat(sec.items);
         const isFirst = si === 0;
-        const itemsHtml = sec.items.map((item, i) =>
-          `<div class="berkas-item">
-            <span class="item-num">${i + 1}</span>
-            <span class="item-text">${item}</span>
-          </div>`
-        ).join('');
+        const itemsHtml = sec.items.map((item, i) => renderBerkasItem(item, i)).join('');
 
         if (isFirst) {
           innerHtml += `<div class="card-head ${data.color}">
@@ -454,12 +496,7 @@ function buildAllBerkas() {
       });
     } else {
       allItems = data.items;
-      const itemsHtml = data.items.map((item, i) =>
-        `<div class="berkas-item">
-          <span class="item-num">${i + 1}</span>
-          <span class="item-text">${item}</span>
-        </div>`
-      ).join('');
+      const itemsHtml = data.items.map((item, i) => renderBerkasItem(item, i)).join('');
       innerHtml = `<div class="card-head ${data.color}">
         <span class="card-head-icon">${data.icon}</span>
         <div><h4>${data.label}</h4><p>${data.items.length} berkas diperlukan</p></div>
