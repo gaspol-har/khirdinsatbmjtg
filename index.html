@@ -546,6 +546,7 @@ function printChecklist(tabKey) {
   const data = BERKAS[tabKey];
   if (!data) return;
   const today = new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
+  const logoUrl = new URL('korps-brimob-seeklogo.png', window.location.href).href;
 
   let sectionsHtml = '';
   if (data.sections) {
@@ -565,7 +566,8 @@ function printChecklist(tabKey) {
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:Arial,sans-serif;padding:28pt 36pt;color:#222;font-size:10.5pt}
     .kop{display:flex;align-items:center;gap:14pt;padding-bottom:10pt;border-bottom:3pt solid #0A1628;margin-bottom:6pt}
-    .emblem{width:44pt;height:44pt;border-radius:50%;background:#C9A227;display:flex;align-items:center;justify-content:center;font-size:18pt;font-weight:700;color:#0A1628;border:2pt solid #0A1628;flex-shrink:0}
+    .emblem{width:44pt;height:44pt;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;border:2pt solid #0A1628;flex-shrink:0;overflow:hidden}
+    .emblem img{width:80%;height:80%;object-fit:contain}
     .kop-text h1{font-size:13.5pt;font-weight:700;color:#0A1628}
     .kop-text p{font-size:9.5pt;color:#555;margin-top:2pt}
     .doc-title{font-size:14pt;font-weight:700;color:#0A1628;margin:12pt 0 4pt}
@@ -584,7 +586,7 @@ function printChecklist(tabKey) {
   </style>
   </head><body>
   <div class="kop">
-    <div class="emblem">⚜</div>
+    <div class="emblem"><img src="${logoUrl}" alt="Logo Brimob"></div>
     <div class="kop-text">
       <h1>Khirdin Satbrimob Polda Jateng</h1>
       <p>Sistem Informasi Administrasi Internal &nbsp;|&nbsp; Tanggal cetak: ${today}</p>
