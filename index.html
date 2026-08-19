@@ -109,6 +109,39 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--light);color:va
 .form-dl-btn:hover{opacity:.85}
 .form-dl-btn.disabled{background:var(--border);color:var(--text-muted);cursor:default;pointer-events:none}
 
+/* ISI FORMULIR PAGE */
+.isi-select-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:24px}
+.isi-select-card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:0 2px 8px rgba(10,22,40,.06);display:flex;flex-direction:column;cursor:pointer;transition:all .2s}
+.isi-select-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.isi-select-card .form-card-head{background:linear-gradient(135deg,#2E1B6E,#534AB7);padding:14px 18px}
+.isi-select-card .form-card-head h4{font-size:13.5px;font-weight:700;color:#fff}
+.isi-select-card .form-card-head p{font-size:11.5px;color:rgba(255,255,255,.65);margin-top:3px;line-height:1.4}
+.isi-select-body{padding:14px 18px;flex:1;display:flex;align-items:flex-end}
+.isi-select-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:var(--navy);padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer}
+
+.fill-panel{display:none;background:#fff;border-radius:12px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(10,22,40,.06);margin-bottom:24px;overflow:hidden}
+.fill-panel.active{display:block}
+.fill-panel-head{background:linear-gradient(135deg,var(--navy),var(--blue));padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.fill-panel-head h3{font-family:'DM Serif Display',serif;font-size:17px;color:#fff}
+.fill-panel-head p{font-size:11.5px;color:rgba(255,255,255,.65);margin-top:2px}
+.fill-back-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+.fill-back-btn:hover{background:rgba(255,255,255,.22)}
+.fill-body{padding:20px 22px}
+.fill-field{margin-bottom:14px}
+.fill-field label{display:block;font-size:12.5px;font-weight:600;color:var(--text-mid);margin-bottom:5px}
+.fill-field .req{color:#A32D2D}
+.fill-field input,.fill-field select,.fill-field textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--text);background:#fff}
+.fill-field input:focus,.fill-field select:focus,.fill-field textarea:focus{outline:none;border-color:var(--blue)}
+.fill-field textarea{resize:vertical;min-height:64px}
+.fill-field .hint{font-size:11px;color:var(--text-muted);margin-top:4px}
+.fill-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+@media(max-width:560px){.fill-grid-2{grid-template-columns:1fr}}
+.fill-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;padding-top:16px;border-top:1px dashed var(--border)}
+.fill-submit-btn{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;border:none;padding:11px 20px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s}
+.fill-submit-btn:hover{opacity:.85}
+.fill-reset-btn{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--text-mid);border:1.5px solid var(--border);padding:11px 20px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.fill-reset-btn:hover{border-color:var(--blue);color:var(--blue)}
+
 .footer{text-align:center;padding:20px;color:var(--text-muted);font-size:12px;border-top:1px solid var(--border);margin-top:16px}
 
 @media(max-width:600px){
@@ -135,6 +168,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--light);color:va
   <nav class="nav">
     <button class="nav-btn active" onclick="showPage('berkas',this)">📋 Persyaratan Berkas</button>
     <button class="nav-btn" onclick="showPage('forms',this)">📥 Unduh Formulir</button>
+    <button class="nav-btn" onclick="showPage('isi',this)">📝 Isi Formulir</button>
   </nav>
 </div>
 
@@ -182,6 +216,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--light);color:va
       Hubungi admin jika tautan tidak dapat diakses.
     </div>
     <div class="forms-grid" id="forms-grid"></div>
+  </div>
+
+  <!-- PAGE: ISI FORMULIR -->
+  <div class="page" id="page-isi">
+    <div class="forms-intro">
+      📝 Pilih jenis formulir di bawah, isi data sesuai kolom yang tersedia, lalu klik <strong>Buat &amp; Cetak PDF</strong>.
+      Dokumen akan terbuka siap cetak / simpan sebagai PDF (gunakan opsi "Save as PDF" pada dialog cetak).
+    </div>
+    <div class="isi-select-grid" id="isi-select-grid"></div>
+    <div id="fill-panels"></div>
   </div>
 
 </div>
@@ -626,6 +670,330 @@ function buildPrintTable(items) {
   </table>`;
 }
 
+// ─── DATA ISI FORMULIR — FIELD PER JENIS FORM ─────────────────────────────────
+// Setiap formulir punya field berbeda sesuai kebutuhan datanya.
+const FILL_FORMS = [
+  {
+    id: 'sp3r-asabri',
+    label: 'Form SP3R ASABRI',
+    desc: 'Surat Pengajuan Pembayaran Pensiun Pertama',
+    icon: '🏦',
+    docTitle: 'SURAT PENGAJUAN PEMBAYARAN PENSIUN PERTAMA (SP3R)',
+    fields: [
+      {name:'nama', label:'Nama Lengkap', type:'text', required:true},
+      {name:'pangkat', label:'Pangkat', type:'text', required:true},
+      {name:'nrp', label:'NRP', type:'text', required:true},
+      {name:'jabatan_terakhir', label:'Jabatan Terakhir', type:'text', required:true},
+      {name:'satuan', label:'Satuan Kerja', type:'text', required:true},
+      {name:'tmt_pensiun', label:'TMT Pensiun', type:'date', required:true},
+      {name:'alamat', label:'Alamat Domisili Setelah Pensiun', type:'textarea', required:true},
+      {name:'no_hp', label:'No. HP / WA', type:'text', required:true},
+      {name:'bank', label:'Nama Bank', type:'text', required:true},
+      {name:'no_rekening', label:'No. Rekening', type:'text', required:true},
+      {name:'atas_nama_rekening', label:'Rekening Atas Nama', type:'text', required:true}
+    ]
+  },
+  {
+    id: 'pengajuan-asabri',
+    label: 'Form Pengajuan ASABRI',
+    desc: 'Formulir Pengajuan Klaim / Layanan ASABRI',
+    icon: '🧾',
+    docTitle: 'SURAT PENGAJUAN KLAIM / LAYANAN ASABRI',
+    fields: [
+      {name:'nama', label:'Nama Lengkap', type:'text', required:true},
+      {name:'pangkat', label:'Pangkat', type:'text', required:true},
+      {name:'nrp', label:'NRP', type:'text', required:true},
+      {name:'satuan', label:'Satuan Kerja', type:'text', required:true},
+      {name:'jenis_pengajuan', label:'Jenis Pengajuan', type:'select', required:true,
+        options:['Pensiun','Warakawuri','Tewas','PUM','Tunjangan Duka Sejahtera','Lainnya']},
+      {name:'alamat', label:'Alamat', type:'textarea', required:true},
+      {name:'no_hp', label:'No. HP / WA', type:'text', required:true},
+      {name:'keterangan', label:'Keterangan Tambahan', type:'textarea', required:false}
+    ]
+  },
+  {
+    id: 'tds',
+    label: 'Form TDS',
+    desc: 'Formulir Tunjangan Duka Sejahtera',
+    icon: '🕊️',
+    docTitle: 'FORMULIR TUNJANGAN DUKA SEJAHTERA (TDS)',
+    fields: [
+      {name:'nama_almarhum', label:'Nama Almarhum/Almarhumah', type:'text', required:true},
+      {name:'pangkat', label:'Pangkat', type:'text', required:true},
+      {name:'nrp', label:'NRP', type:'text', required:true},
+      {name:'satuan', label:'Satuan Kerja', type:'text', required:true},
+      {name:'tanggal_wafat', label:'Tanggal Wafat', type:'date', required:true},
+      {name:'nama_ahli_waris', label:'Nama Ahli Waris / Penerima', type:'text', required:true},
+      {name:'hubungan', label:'Hubungan dengan Almarhum', type:'select', required:true,
+        options:['Istri','Suami','Anak','Orang Tua','Saudara Kandung','Lainnya']},
+      {name:'alamat', label:'Alamat Ahli Waris', type:'textarea', required:true},
+      {name:'no_hp', label:'No. HP / WA', type:'text', required:true},
+      {name:'bank', label:'Nama Bank', type:'text', required:true},
+      {name:'no_rekening', label:'No. Rekening', type:'text', required:true}
+    ]
+  },
+  {
+    id: 'tpb',
+    label: 'Form TPB',
+    desc: 'Formulir Tabungan Perumahan / Pinjaman Berbantuan',
+    icon: '🏠',
+    docTitle: 'FORMULIR TABUNGAN PERUMAHAN / PINJAMAN BERBANTUAN (TPB)',
+    fields: [
+      {name:'nama', label:'Nama Lengkap', type:'text', required:true},
+      {name:'pangkat', label:'Pangkat', type:'text', required:true},
+      {name:'nrp', label:'NRP', type:'text', required:true},
+      {name:'satuan', label:'Satuan Kerja', type:'text', required:true},
+      {name:'alamat', label:'Alamat', type:'textarea', required:true},
+      {name:'no_hp', label:'No. HP / WA', type:'text', required:true},
+      {name:'tujuan_pinjaman', label:'Tujuan Penggunaan', type:'select', required:true,
+        options:['Pembangunan Rumah','Renovasi Rumah','Pembelian Rumah','Pelunasan KPR','Lainnya']},
+      {name:'jumlah_pengajuan', label:'Jumlah Pengajuan (Rp)', type:'text', required:true},
+      {name:'bank', label:'Nama Bank', type:'text', required:true},
+      {name:'no_rekening', label:'No. Rekening', type:'text', required:true}
+    ]
+  },
+  {
+    id: 'belum-menikah-lagi',
+    label: 'Surat Pernyataan Belum Menikah Lagi',
+    desc: 'Surat keterangan dari Kelurahan bahwa yang bersangkutan belum menikah lagi',
+    icon: '📄',
+    docTitle: 'SURAT PERNYATAAN BELUM MENIKAH LAGI',
+    fields: [
+      {name:'nama', label:'Nama Lengkap', type:'text', required:true},
+      {name:'nik', label:'NIK', type:'text', required:true},
+      {name:'tempat_lahir', label:'Tempat Lahir', type:'text', required:true},
+      {name:'tanggal_lahir', label:'Tanggal Lahir', type:'date', required:true},
+      {name:'pekerjaan', label:'Pekerjaan', type:'text', required:false},
+      {name:'alamat', label:'Alamat Lengkap', type:'textarea', required:true},
+      {name:'nama_almarhum_suami_istri', label:'Nama Almarhum Suami/Istri', type:'text', required:true},
+      {name:'tanggal_wafat_pasangan', label:'Tanggal Wafat Pasangan', type:'date', required:true}
+    ]
+  },
+  {
+    id: 'ku1',
+    label: 'Surat KU 1',
+    desc: 'Daftar Keluarga Penerima Tunjangan',
+    icon: '👨‍👩‍👧‍👦',
+    docTitle: 'DAFTAR KELUARGA PENERIMA TUNJANGAN (KU-1)',
+    fields: [
+      {name:'nama_pegawai', label:'Nama Pegawai / Pensiunan', type:'text', required:true},
+      {name:'pangkat', label:'Pangkat', type:'text', required:true},
+      {name:'nrp', label:'NRP', type:'text', required:true},
+      {name:'satuan', label:'Satuan Kerja', type:'text', required:true},
+      {name:'alamat', label:'Alamat', type:'textarea', required:true},
+      {name:'daftar_keluarga', label:'Daftar Anggota Keluarga (Nama — Hubungan — Tgl Lahir, satu baris per orang)', type:'textarea', required:true,
+        hint:'Contoh: Siti Aminah — Istri — 12-05-1980'}
+    ]
+  },
+  {
+    id: 'alamat-pensiun',
+    label: 'Surat Penunjukan Alamat Pensiun',
+    desc: 'Surat keterangan penunjukan alamat setelah pensiun',
+    icon: '📍',
+    docTitle: 'SURAT PERNYATAAN PENUNJUKAN ALAMAT PENSIUN',
+    fields: [
+      {name:'nama', label:'Nama Lengkap', type:'text', required:true},
+      {name:'pangkat', label:'Pangkat', type:'text', required:true},
+      {name:'nrp', label:'NRP', type:'text', required:true},
+      {name:'satuan', label:'Satuan Kerja', type:'text', required:true},
+      {name:'alamat_pensiun', label:'Alamat Domisili Setelah Pensiun', type:'textarea', required:true},
+      {name:'kelurahan', label:'Kelurahan / Desa', type:'text', required:true},
+      {name:'kecamatan', label:'Kecamatan', type:'text', required:true},
+      {name:'kabupaten_kota', label:'Kabupaten / Kota', type:'text', required:true},
+      {name:'no_hp', label:'No. HP / WA', type:'text', required:true}
+    ]
+  },
+  {
+    id: 'ahli-waris',
+    label: 'Surat Keterangan Ahli Waris',
+    desc: 'Surat keterangan susunan ahli waris yang disahkan oleh Lurah / Kepala Desa',
+    icon: '⚖️',
+    docTitle: 'SURAT KETERANGAN AHLI WARIS',
+    fields: [
+      {name:'nama_pewaris', label:'Nama Pewaris (Almarhum/Almarhumah)', type:'text', required:true},
+      {name:'nik_pewaris', label:'NIK Pewaris', type:'text', required:false},
+      {name:'tanggal_wafat', label:'Tanggal Wafat', type:'date', required:true},
+      {name:'alamat_terakhir', label:'Alamat Terakhir Pewaris', type:'textarea', required:true},
+      {name:'daftar_ahli_waris', label:'Daftar Ahli Waris (Nama — Hubungan — Usia, satu baris per orang)', type:'textarea', required:true,
+        hint:'Contoh: Budi Santoso — Anak Kandung — 24 tahun'},
+      {name:'disahkan_oleh', label:'Disahkan Oleh (Lurah/Kepala Desa)', type:'text', required:true},
+      {name:'kelurahan', label:'Kelurahan / Desa', type:'text', required:true}
+    ]
+  }
+];
+
+// ─── RENDER PILIHAN + PANEL ISI FORMULIR ───────────────────────────────────────
+function buildIsiForms() {
+  const grid = document.getElementById('isi-select-grid');
+  grid.innerHTML = FILL_FORMS.map(f => `
+    <div class="isi-select-card" onclick="openFillPanel('${f.id}')">
+      <div class="form-card-head">
+        <h4>${f.icon} ${f.label}</h4>
+        <p>${f.desc}</p>
+      </div>
+      <div class="isi-select-body">
+        <button class="isi-select-btn" onclick="event.stopPropagation();openFillPanel('${f.id}')">✏️ Isi Formulir Ini</button>
+      </div>
+    </div>`).join('');
+
+  const panels = document.getElementById('fill-panels');
+  panels.innerHTML = FILL_FORMS.map(f => `
+    <div class="fill-panel" id="fill-panel-${f.id}">
+      <div class="fill-panel-head">
+        <div>
+          <h3>${f.icon} ${f.label}</h3>
+          <p>${f.desc}</p>
+        </div>
+        <button class="fill-back-btn" onclick="closeFillPanel('${f.id}')">← Kembali ke Daftar</button>
+      </div>
+      <div class="fill-body">
+        <form id="form-${f.id}" onsubmit="return generateFilledPdf(event,'${f.id}')">
+          <div class="fill-grid-2">
+            ${f.fields.map(field => renderFillField(f.id, field)).join('')}
+          </div>
+          <div class="fill-actions">
+            <button type="submit" class="fill-submit-btn">🖨️ Buat &amp; Cetak PDF</button>
+            <button type="reset" class="fill-reset-btn">↺ Reset Form</button>
+          </div>
+        </form>
+      </div>
+    </div>`).join('');
+}
+
+function renderFillField(formId, field) {
+  const fid = `${formId}__${field.name}`;
+  const reqMark = field.required ? '<span class="req">*</span>' : '';
+  const reqAttr = field.required ? 'required' : '';
+  const wrapWide = field.type === 'textarea' ? 'style="grid-column:1/-1"' : '';
+  let control = '';
+  if (field.type === 'textarea') {
+    control = `<textarea id="${fid}" name="${field.name}" ${reqAttr}></textarea>`;
+  } else if (field.type === 'select') {
+    control = `<select id="${fid}" name="${field.name}" ${reqAttr}>
+      <option value="">— Pilih —</option>
+      ${field.options.map(o => `<option value="${o}">${o}</option>`).join('')}
+    </select>`;
+  } else {
+    control = `<input type="${field.type}" id="${fid}" name="${field.name}" ${reqAttr}>`;
+  }
+  return `<div class="fill-field" ${wrapWide}>
+    <label for="${fid}">${field.label} ${reqMark}</label>
+    ${control}
+    ${field.hint ? `<div class="hint">${field.hint}</div>` : ''}
+  </div>`;
+}
+
+function openFillPanel(id) {
+  document.querySelectorAll('.fill-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('fill-panel-' + id).classList.add('active');
+  document.getElementById('fill-panel-' + id).scrollIntoView({behavior:'smooth', block:'start'});
+}
+function closeFillPanel(id) {
+  document.getElementById('fill-panel-' + id).classList.remove('active');
+}
+
+// ─── GENERATE PDF SIAP CETAK DARI FORM YANG DIISI ──────────────────────────────
+function generateFilledPdf(evt, formId) {
+  evt.preventDefault();
+  const def = FILL_FORMS.find(f => f.id === formId);
+  if (!def) return false;
+
+  const formEl = document.getElementById('form-' + formId);
+  const data = {};
+  def.fields.forEach(field => {
+    const el = document.getElementById(`${formId}__${field.name}`);
+    data[field.name] = el ? el.value.trim() : '';
+  });
+
+  const missing = def.fields.filter(f => f.required && !data[f.name]);
+  if (missing.length) {
+    alert('Mohon lengkapi kolom wajib: ' + missing.map(f => f.label).join(', '));
+    return false;
+  }
+
+  const today = new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
+  const logoUrl = new URL('korps-brimob-seeklogo.png', window.location.href).href;
+
+  const formatVal = (field) => {
+    const v = data[field.name];
+    if (!v) return '-';
+    if (field.type === 'date') {
+      try { return new Date(v).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'}); }
+      catch(e){ return v; }
+    }
+    if (field.type === 'textarea' && v.includes('\n')) {
+      return v.split('\n').filter(l=>l.trim()).map((l,i)=>`${i+1}. ${l.trim()}`).join('<br>');
+    }
+    return v.replace(/\n/g,'<br>');
+  };
+
+  const rowsHtml = def.fields.map(field => `
+    <tr>
+      <td class="field-label">${field.label}</td>
+      <td class="field-colon">:</td>
+      <td class="field-value">${formatVal(field)}</td>
+    </tr>`).join('');
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html lang="id"><head>
+  <meta charset="UTF-8">
+  <title>${def.docTitle} — Khirdin Satbrimob Polda Jateng</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;padding:30pt 40pt;color:#1a1a1a;font-size:11pt;line-height:1.5}
+    .kop{display:flex;align-items:center;gap:14pt;padding-bottom:10pt;border-bottom:3pt solid #0A1628;margin-bottom:18pt}
+    .emblem{width:46pt;height:46pt;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;border:2pt solid #0A1628;flex-shrink:0;overflow:hidden}
+    .emblem img{width:80%;height:80%;object-fit:contain}
+    .kop-text h1{font-size:13.5pt;font-weight:700;color:#0A1628}
+    .kop-text p{font-size:9.5pt;color:#555;margin-top:2pt}
+    .doc-title{font-size:14pt;font-weight:700;color:#0A1628;text-align:center;text-transform:uppercase;margin-bottom:2pt;text-decoration:underline}
+    .doc-sub{font-size:9pt;color:#777;text-align:center;margin-bottom:20pt}
+    .field-table{width:100%;border-collapse:collapse;margin-bottom:26pt}
+    .field-table td{padding:5pt 4pt;vertical-align:top;font-size:10.5pt}
+    .field-label{width:220pt;font-weight:600;color:#0A1628}
+    .field-colon{width:12pt}
+    .field-value{color:#222}
+    .statement{font-size:10.5pt;margin:16pt 0;text-align:justify;line-height:1.7}
+    .sign-block{display:flex;justify-content:flex-end;margin-top:36pt}
+    .sign-col{text-align:center;font-size:10.5pt;width:200pt}
+    .sign-space{height:60pt}
+    .footer{margin-top:30pt;padding-top:10pt;border-top:0.5pt solid #ccc;display:flex;justify-content:space-between;font-size:8.5pt;color:#888}
+    @media print{body{padding:20pt 30pt}}
+  </style>
+  </head><body>
+  <div class="kop">
+    <div class="emblem"><img src="${logoUrl}" alt="Logo Brimob"></div>
+    <div class="kop-text">
+      <h1>Khirdin Satbrimob Polda Jateng</h1>
+      <p>Sistem Informasi Administrasi Internal &nbsp;|&nbsp; Tanggal cetak: ${today}</p>
+    </div>
+  </div>
+  <div class="doc-title">${def.docTitle}</div>
+  <div class="doc-sub">${def.desc}</div>
+  <table class="field-table">${rowsHtml}</table>
+  <div class="statement">
+    Demikian data pada formulir ini diisi dengan sebenar-benarnya untuk digunakan sebagai kelengkapan
+    berkas administrasi. Apabila di kemudian hari terdapat kekeliruan data, kami bersedia melakukan
+    perbaikan sesuai ketentuan yang berlaku.
+  </div>
+  <div class="sign-block">
+    <div class="sign-col">
+      <div>Semarang, ${today}</div>
+      <div>Yang Membuat Pernyataan,</div>
+      <div class="sign-space"></div>
+      <div style="font-weight:700;text-decoration:underline">${data[def.fields[0].name] || '.......................'}</div>
+    </div>
+  </div>
+  <div class="footer">
+    <span>Khirdin Satbrimob Polda Jateng</span>
+    <span>Dicetak: ${today}</span>
+  </div>
+  <script>window.onload = () => window.print();<\/script>
+  </body></html>`);
+  win.document.close();
+  return false;
+}
+
 // ─── NAVIGASI ──────────────────────────────────────────────────────────────────
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -643,6 +1011,7 @@ function showTab(id, btn) {
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 buildAllBerkas();
 buildForms();
+buildIsiForms();
 </script>
 </body>
 </html>
