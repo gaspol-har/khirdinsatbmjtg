@@ -670,138 +670,468 @@ function buildPrintTable(items) {
   </table>`;
 }
 
-// ─── DATA ISI FORMULIR — FIELD PER JENIS FORM ─────────────────────────────────
-// Setiap formulir punya field berbeda sesuai kebutuhan datanya.
+// ─── DATA ISI FORMULIR — FIELD & TEMPLATE CETAK PERSIS SEPERTI FORM ASLI ───────
+// Field & layout cetak disesuaikan satu-per-satu dengan dokumen asli ASABRI/Polri
+// (hasil pemeriksaan file asli di menu Unduh Formulir).
+const ASABRI_LOGO = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Logo_ASABRI.png/240px-Logo_ASABRI.png';
+
+function idDate(v) {
+  if (!v) return '.......................';
+  try { return new Date(v).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'}); }
+  catch(e){ return v; }
+}
+function dashIfEmpty(v) { return v && v.trim() ? v.trim() : '.......................'; }
+function listRows(text) {
+  if (!text || !text.trim()) return [];
+  return text.split('\n').map(l => l.trim()).filter(Boolean);
+}
+
 const FILL_FORMS = [
   {
     id: 'sp3r-asabri',
     label: 'Form SP3R ASABRI',
     desc: 'Surat Pengajuan Pembayaran Pensiun Pertama',
     icon: '🏦',
-    docTitle: 'SURAT PENGAJUAN PEMBAYARAN PENSIUN PERTAMA (SP3R)',
+    docTitle: 'SURAT PERNYATAAN PEMBAYARAN PENSIUN MELALUI REKENING (SP3R) DAN KUASA PENGELOLAAN REKENING PEMBAYARAN PENSIUN',
+    logo: ASABRI_LOGO,
     fields: [
-      {name:'nama', label:'Nama Lengkap', type:'text', required:true},
+      {name:'nama_peserta', label:'Nama Peserta', type:'text', required:true},
+      {name:'nrp_nip', label:'NRP/NIP', type:'text', required:true},
       {name:'pangkat', label:'Pangkat', type:'text', required:true},
-      {name:'nrp', label:'NRP', type:'text', required:true},
-      {name:'jabatan_terakhir', label:'Jabatan Terakhir', type:'text', required:true},
-      {name:'satuan', label:'Satuan Kerja', type:'text', required:true},
-      {name:'tmt_pensiun', label:'TMT Pensiun', type:'date', required:true},
-      {name:'alamat', label:'Alamat Domisili Setelah Pensiun', type:'textarea', required:true},
-      {name:'no_hp', label:'No. HP / WA', type:'text', required:true},
-      {name:'bank', label:'Nama Bank', type:'text', required:true},
-      {name:'no_rekening', label:'No. Rekening', type:'text', required:true},
-      {name:'atas_nama_rekening', label:'Rekening Atas Nama', type:'text', required:true}
-    ]
+      {name:'nik', label:'NIK', type:'text', required:true},
+      {name:'nomor_pensiun', label:'Nomor Pensiun', type:'text', required:false},
+      {name:'nama_penerima', label:'Nama Penerima Pensiun', type:'text', required:true},
+      {name:'nik_penerima', label:'NIK Penerima', type:'text', required:true},
+      {name:'hubungan', label:'Hubungan dengan Peserta', type:'select', required:true,
+        options:['Yang Bersangkutan','Istri','Suami','Orang Tua','Anak','Wali']},
+      {name:'nomor_pensiun_penerima', label:'Nomor Pensiun (Penerima)', type:'text', required:false},
+      {name:'jalan', label:'Alamat — Jalan', type:'text', required:true},
+      {name:'rt_rw', label:'RT/RW', type:'text', required:false},
+      {name:'kelurahan', label:'Kelurahan', type:'text', required:true},
+      {name:'kecamatan', label:'Kecamatan', type:'text', required:true},
+      {name:'kabupaten_kodya', label:'Kabupaten/Kodya', type:'text', required:true},
+      {name:'provinsi', label:'Provinsi', type:'text', required:true},
+      {name:'no_telp', label:'Nomor Telepon/HP', type:'text', required:true},
+      {name:'bank_giro', label:'Bank/Giro', type:'text', required:true},
+      {name:'no_rekening', label:'Nomor Rekening', type:'text', required:true}
+    ],
+    printBody: (d) => `
+      <div class="doc-title">SURAT PERNYATAAN PEMBAYARAN PENSIUN MELALUI REKENING (SP3R)</div>
+      <div class="doc-title2">DAN KUASA PENGELOLAAN REKENING PEMBAYARAN PENSIUN</div>
+      <div class="section-lbl">Data Peserta:</div>
+      <table class="numbered-table">
+        <tr><td class="no">1.</td><td class="lbl">Nama Peserta</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_peserta)}</td></tr>
+        <tr><td class="no">2.</td><td class="lbl">NRP/NIP</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nrp_nip)}</td></tr>
+        <tr><td class="no">3.</td><td class="lbl">Pangkat</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.pangkat)}</td></tr>
+        <tr><td class="no">4.</td><td class="lbl">NIK</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nik)}</td></tr>
+        <tr><td class="no">5.</td><td class="lbl">Nomor Pensiun</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nomor_pensiun)}</td></tr>
+      </table>
+      <div class="section-lbl">Yang bertanda tangan di bawah ini:</div>
+      <table class="numbered-table">
+        <tr><td class="no">1.</td><td class="lbl">Nama Penerima Pensiun</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_penerima)}</td></tr>
+        <tr><td class="no">2.</td><td class="lbl">NIK</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nik_penerima)}</td></tr>
+        <tr><td class="no">3.</td><td class="lbl">Hubungan dengan Peserta</td><td class="colon">:</td><td class="val">Sebagai ${dashIfEmpty(d.hubungan)}</td></tr>
+        <tr><td class="no">4.</td><td class="lbl">Nomor Pensiun</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nomor_pensiun_penerima)}</td></tr>
+        <tr><td class="no">5.</td><td class="lbl">Alamat Lengkap</td><td class="colon">:</td><td class="val"></td></tr>
+        <tr><td class="no"></td><td class="lbl sub">Jalan</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.jalan)}</td></tr>
+        <tr><td class="no"></td><td class="lbl sub">RT/RW</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.rt_rw)}</td></tr>
+        <tr><td class="no"></td><td class="lbl sub">Kelurahan</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.kelurahan)}</td></tr>
+        <tr><td class="no"></td><td class="lbl sub">Kecamatan</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.kecamatan)}</td></tr>
+        <tr><td class="no"></td><td class="lbl sub">Kabupaten/Kodya</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.kabupaten_kodya)}</td></tr>
+        <tr><td class="no"></td><td class="lbl sub">Provinsi</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.provinsi)} &nbsp;&nbsp; Nomor Telepon/HP: ${dashIfEmpty(d.no_telp)}</td></tr>
+        <tr><td class="no">6.</td><td class="lbl">Bank/Giro</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.bank_giro)} &nbsp;&nbsp; Nomor Rekening: ${dashIfEmpty(d.no_rekening)}</td></tr>
+      </table>
+      <div class="statement">Sehubungan dengan pembayaran pensiun melalui rekening tersebut di atas, dengan ini saya menyatakan:</div>
+      <ol class="legal-list">
+        <li>Memberi persetujuan kepada PT ASABRI (Persero) maupun kepada BANK/GIRO untuk melakukan pemrosesan data pribadi saya termasuk namun tidak terbatas pada penyerahan data pribadi saya untuk proses penegakan hukum kepada aparat penegak hukum maupun untuk dipertunjukkan di dalam pengadilan baik untuk perkara pidana maupun perdata.</li>
+        <li>Memberi kuasa dengan hak substitusi kepada Mitra Kerja Pembayaran Pensiun PT ASABRI (Persero) untuk mendebet rekening saya dan untuk mengembalikan seluruh kelebihan pembayaran uang pensiun yang bukan merupakan hak saya atau ahli waris menurut ketentuan PT ASABRI (Persero).</li>
+        <li>Memberi kuasa dengan hak substitusi kepada BANK/GIRO khusus untuk memberi keterangan/informasi/data mengenai simpanan saya dan data diri saya sebagai nasabah penyimpanan termasuk namun tidak terbatas pada NIK, status perkawinan, status pekerjaan, dan status rekening kepada PT ASABRI (Persero).</li>
+        <li>Kuasa sebagaimana tersebut pada butir 2 di atas, tidak akan berakhir selama kewajiban saya atau ahli waris saya untuk mengembalikan kelebihan pembayaran pensiun yang bukan merupakan hak saya atau ahli waris saya menurut ketentuan PT ASABRI (Persero) belum dilakukan sepenuhnya maupun oleh sebab-sebab yang tercantum pada Pasal 1813 Kitab Undang-Undang Hukum Perdata.</li>
+        <li>Akan melaporkan ke Kantor Cabang PT ASABRI (Persero) terdekat apabila terjadi perubahan data susunan keluarga, status perkawinan, alamat, ataupun perubahan data lainnya.</li>
+        <li>Segala kelebihan/keterlanjuran bayar pensiun yang saya terima sepenuhnya menjadi tanggung jawab saya dan/atau ahli waris, untuk dikembalikan kepada PT ASABRI (Persero), yang disebabkan oleh namun tidak terbatas pada: (a) keterlanjuran gaji pensiun karena keterlambatan pelaporan; (b) keterlanjuran tunjangan karena keterlambatan pelaporan.</li>
+        <li>Pembayaran pensiun saya melalui rekening bank/giro sebagaimana yang tercantum dalam Surat Pernyataan ini tidak memiliki permasalahan kredit dengan Mitra Kerja Pembayaran Pensiun PT ASABRI (Persero) lainnya.</li>
+        <li>Pernyataan ini saya buat dengan sebenar-benarnya dan saya akan bertanggung jawab penuh secara hukum atas segala ketidaksesuaian dengan pernyataan ini.</li>
+      </ol>
+      <div class="warning-box">
+        <strong>PERHATIAN!!!</strong><br>
+        Barang Siapa yang memberikan keterangan tidak benar atau memalsukan keterangan ini akan dituntut sesuai peraturan perundang-undangan yang berlaku
+      </div>
+      <div class="dist-note">
+        Disampaikan:<br>1. Lembar I untuk Bank/Giro&nbsp;&nbsp;2. Lembar II untuk Kantor Cabang PT ASABRI (Persero)&nbsp;&nbsp;3. Lembar III untuk penerima Pensiun
+      </div>
+      <div class="sign-block">
+        <div class="sign-col">
+          <div>Semarang, ${idDate(new Date().toISOString())}</div>
+          <div>Yang Menyatakan,</div>
+          <div class="sign-space"></div>
+          <div class="sign-name">( ${dashIfEmpty(d.nama_penerima)} )</div>
+        </div>
+      </div>`
   },
   {
     id: 'pengajuan-asabri',
     label: 'Form Pengajuan ASABRI',
     desc: 'Formulir Pengajuan Klaim / Layanan ASABRI',
     icon: '🧾',
-    docTitle: 'SURAT PENGAJUAN KLAIM / LAYANAN ASABRI',
+    docTitle: 'FORMULIR PENGAJUAN',
+    logo: ASABRI_LOGO,
     fields: [
-      {name:'nama', label:'Nama Lengkap', type:'text', required:true},
-      {name:'pangkat', label:'Pangkat', type:'text', required:true},
-      {name:'nrp', label:'NRP', type:'text', required:true},
-      {name:'satuan', label:'Satuan Kerja', type:'text', required:true},
-      {name:'jenis_pengajuan', label:'Jenis Pengajuan', type:'select', required:true,
-        options:['Pensiun','Warakawuri','Tewas','PUM','Tunjangan Duka Sejahtera','Lainnya']},
-      {name:'alamat', label:'Alamat', type:'textarea', required:true},
-      {name:'no_hp', label:'No. HP / WA', type:'text', required:true},
-      {name:'keterangan', label:'Keterangan Tambahan', type:'textarea', required:false}
-    ]
+      {name:'jenis_klaim', label:'Jenis Klaim', type:'select', required:true,
+        options:['THT','JKK','JKM','PENSIUN']},
+      {name:'sub_klaim', label:'Sub Jenis (mis. Sendiri / Tunjangan Terbatas / Wari/Janda/Duda / UKP / Mutasi, dst)', type:'text', required:false},
+      {name:'nama_peserta', label:'Nama Peserta ASABRI', type:'text', required:true},
+      {name:'jk_peserta', label:'Jenis Kelamin Peserta', type:'select', required:true, options:['L','P']},
+      {name:'tgl_lahir_peserta', label:'Tanggal Lahir Peserta', type:'date', required:true},
+      {name:'nrp_nip', label:'NRP/NIP', type:'text', required:true},
+      {name:'no_ktpa', label:'No. KTPA', type:'text', required:false},
+      {name:'kesatuan', label:'Kesatuan', type:'text', required:true},
+      {name:'no_kta', label:'No. KTA', type:'text', required:false},
+      {name:'nama_pengaju', label:'Nama Pengaju', type:'text', required:true},
+      {name:'jk_pengaju', label:'Jenis Kelamin Pengaju', type:'select', required:true, options:['L','P']},
+      {name:'tgl_lahir_pengaju', label:'Tanggal Lahir Pengaju', type:'date', required:false},
+      {name:'keluarga_ke', label:'Keluarga Ke-', type:'text', required:false},
+      {name:'alamat_pengaju', label:'Alamat Pengaju', type:'text', required:true},
+      {name:'kelurahan', label:'Kelurahan/Desa', type:'text', required:true},
+      {name:'kecamatan', label:'Kecamatan', type:'text', required:true},
+      {name:'kota', label:'Kota', type:'text', required:true},
+      {name:'provinsi', label:'Provinsi', type:'text', required:true},
+      {name:'nik_pengaju', label:'NIK Pengaju', type:'text', required:true},
+      {name:'no_telp', label:'No. Telp/HP', type:'text', required:true},
+      {name:'no_pensiun', label:'No. Pensiun (jika ada)', type:'text', required:false},
+      {name:'bank_pos', label:'Bank/Pos (Kantor Bayar)', type:'text', required:true},
+      {name:'jenis_tabungan', label:'Jenis Tabungan', type:'text', required:false},
+      {name:'no_rekening', label:'No. Rekening', type:'text', required:true}
+    ],
+    printBody: (d) => `
+      <div class="asabri-top">
+        <div class="asabri-top-note">UNTUK PENGAJUAN DAN PENGAMBILAN UANG TIDAK DIPUNGUT BIAYA APAPUN<br><strong>BLANKO INI TIDAK DIPERJUAL BELIKAN</strong></div>
+      </div>
+      <div class="doc-title box-title">FORMULIR PENGAJUAN</div>
+      <div class="section-lbl">A. JENIS KLAIM: <strong>${dashIfEmpty(d.jenis_klaim)}</strong>${d.sub_klaim ? ' — ' + d.sub_klaim : ''}</div>
+      <div class="section-lbl" style="margin-top:14pt">B. PESERTA ASABRI</div>
+      <table class="numbered-table">
+        <tr><td class="lbl">Nama</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_peserta)} &nbsp;&nbsp;(${dashIfEmpty(d.jk_peserta)})</td></tr>
+        <tr><td class="lbl">Tanggal Lahir</td><td class="colon">:</td><td class="val">${idDate(d.tgl_lahir_peserta)}</td></tr>
+        <tr><td class="lbl">NRP/NIP</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nrp_nip)} &nbsp;&nbsp; No. KTPA: ${dashIfEmpty(d.no_ktpa)}</td></tr>
+        <tr><td class="lbl">Kesatuan</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.kesatuan)} &nbsp;&nbsp; No. KTA: ${dashIfEmpty(d.no_kta)}</td></tr>
+      </table>
+      <div class="section-lbl" style="margin-top:14pt">C. PENGAJU</div>
+      <table class="numbered-table">
+        <tr><td class="lbl">Nama</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_pengaju)} &nbsp;&nbsp;(${dashIfEmpty(d.jk_pengaju)})</td></tr>
+        <tr><td class="lbl">Tanggal Lahir</td><td class="colon">:</td><td class="val">${idDate(d.tgl_lahir_pengaju)} &nbsp;&nbsp; Keluarga ke: ${dashIfEmpty(d.keluarga_ke)}</td></tr>
+        <tr><td class="lbl">Alamat</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.alamat_pengaju)}</td></tr>
+        <tr><td class="lbl">Kelurahan/Desa</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.kelurahan)} &nbsp;&nbsp; Kecamatan: ${dashIfEmpty(d.kecamatan)}</td></tr>
+        <tr><td class="lbl">Kota</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.kota)} &nbsp;&nbsp; Provinsi: ${dashIfEmpty(d.provinsi)}</td></tr>
+        <tr><td class="lbl">NIK</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nik_pengaju)} &nbsp;&nbsp; No. Telp/HP: ${dashIfEmpty(d.no_telp)}</td></tr>
+        <tr><td class="lbl">No. Pensiun</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.no_pensiun)}</td></tr>
+      </table>
+      <div class="section-lbl" style="margin-top:14pt">D. KANTOR BAYAR</div>
+      <table class="numbered-table">
+        <tr><td class="lbl">Bank/Pos</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.bank_pos)}</td></tr>
+        <tr><td class="lbl">Jenis Tabungan</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.jenis_tabungan)} &nbsp;&nbsp; No Rekening: ${dashIfEmpty(d.no_rekening)}</td></tr>
+      </table>
+      <div class="statement">Keterangan di atas saya buat dengan sebenar-benarnya dengan penuh kesadaran, apabila keterangan yang saya berikan tidak benar, saya bersedia mengganti seluruh kerugian kepada negara/PT ASABRI (Persero) dan bersedia dituntut sesuai dengan peraturan perundang-undangan yang berlaku.</div>
+      <div class="sign-block">
+        <div class="sign-col">
+          <div>Semarang, ${idDate(new Date().toISOString())}</div>
+          <div>Pengaju,</div>
+          <div class="sign-space"></div>
+          <div class="sign-name">( ${dashIfEmpty(d.nama_pengaju)} )</div>
+        </div>
+      </div>`
   },
   {
     id: 'tds',
     label: 'Form TDS',
-    desc: 'Formulir Tunjangan Duka Sejahtera',
+    desc: 'Formulir Pernyataan Minat Program Taspen Dwiguna Sejahtera',
     icon: '🕊️',
-    docTitle: 'FORMULIR TUNJANGAN DUKA SEJAHTERA (TDS)',
+    docTitle: 'FORMULIR PERNYATAAN MINAT/TIDAK MINAT MENGIKUTI PROGRAM TASPEN DWIGUNA SEJAHTERA (TDS)',
+    logo: ASABRI_LOGO,
     fields: [
-      {name:'nama_almarhum', label:'Nama Almarhum/Almarhumah', type:'text', required:true},
-      {name:'pangkat', label:'Pangkat', type:'text', required:true},
-      {name:'nrp', label:'NRP', type:'text', required:true},
-      {name:'satuan', label:'Satuan Kerja', type:'text', required:true},
-      {name:'tanggal_wafat', label:'Tanggal Wafat', type:'date', required:true},
-      {name:'nama_ahli_waris', label:'Nama Ahli Waris / Penerima', type:'text', required:true},
-      {name:'hubungan', label:'Hubungan dengan Almarhum', type:'select', required:true,
-        options:['Istri','Suami','Anak','Orang Tua','Saudara Kandung','Lainnya']},
-      {name:'alamat', label:'Alamat Ahli Waris', type:'textarea', required:true},
-      {name:'no_hp', label:'No. HP / WA', type:'text', required:true},
-      {name:'bank', label:'Nama Bank', type:'text', required:true},
-      {name:'no_rekening', label:'No. Rekening', type:'text', required:true}
-    ]
+      {name:'nomor_kpa', label:'Nomor KPA', type:'text', required:false},
+      {name:'nama_peserta', label:'Nama Peserta', type:'text', required:true},
+      {name:'nik', label:'NIK', type:'text', required:true},
+      {name:'ttl', label:'Tempat & Tanggal Lahir', type:'text', required:true},
+      {name:'npwp', label:'NPWP', type:'text', required:false},
+      {name:'nrp_nip', label:'NRP/NIP', type:'text', required:true},
+      {name:'email', label:'Alamat Email', type:'text', required:false},
+      {name:'no_hp', label:'Nomor HP', type:'text', required:true},
+      {name:'estimasi_premi', label:'Estimasi Maksimal Premi', type:'text', required:false},
+      {name:'minat', label:'Pernyataan Minat', type:'select', required:true,
+        options:['Berminat mengetahui lebih lanjut & memberi izin data disampaikan ke TLRO','Tidak berminat & tidak memberi izin data disampaikan ke TLRO']}
+    ],
+    printBody: (d) => `
+      <div class="doc-title">FORMULIR PERNYATAAN MINAT/TIDAK MINAT</div>
+      <div class="doc-title2">MENGIKUTI PROGRAM TASPEN DWIGUNA SEJAHTERA (TDS)</div>
+      <div class="statement">Yang bertanda tangan dibawah ini:</div>
+      <table class="numbered-table">
+        <tr><td class="lbl">Nomor KPA</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nomor_kpa)}</td></tr>
+        <tr><td class="lbl">Nama Peserta</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_peserta)}</td></tr>
+        <tr><td class="lbl">NIK</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nik)}</td></tr>
+        <tr><td class="lbl">Tempat & Tanggal Lahir</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.ttl)}</td></tr>
+        <tr><td class="lbl">NPWP</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.npwp)}</td></tr>
+        <tr><td class="lbl">NRP/NIP</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nrp_nip)}</td></tr>
+        <tr><td class="lbl">Alamat Email</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.email)}</td></tr>
+        <tr><td class="lbl">Nomor HP</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.no_hp)}</td></tr>
+        <tr><td class="lbl">Estimasi Maksimal Premi</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.estimasi_premi)}</td></tr>
+      </table>
+      <div class="statement">dengan ini menyatakan bahwa:</div>
+      <ol class="legal-list">
+        <li>sudah mendapatkan informasi dari Customer Service Officer (CSO) PT ASABRI (Persero) terkait manfaat Taspen Dwiguna Sejahtera (TDS) yang sudah bekerja sama antara PT ASABRI (Persero) dengan PT Asuransi Jiwa Taspen. Pernyataan saya: <strong>${dashIfEmpty(d.minat)}</strong>, dan (bila memberi izin) tidak memberikan izin/memberikan izin kepada PT ASABRI (Persero) untuk menyampaikan informasi data saya sebagaimana tersebut di atas termasuk nomor HP saya kepada Taspen Life Relation Officer (TLRO) PT Asuransi Jiwa Taspen.</li>
+        <li>(apabila memberikan izin), bersedia dihubungi oleh petugas Taspen Life Relation Officer (TLRO) untuk mendapatkan penjelasan lebih lanjut tentang Program Taspen Dwiguna Sejahtera (TDS) serta proses yang perlu dilakukan untuk mengikuti program tersebut.</li>
+      </ol>
+      <div class="statement">Demikian pernyataan ini saya buat dengan sebenar-benarnya dalam keadaan sadar dan tanpa paksaan dari pihak manapun.</div>
+      <div class="sign-block two-col">
+        <div class="sign-col">
+          <div>Mengetahui,</div>
+          <div>Customer Service Officer (CSO)</div>
+          <div>PT ASABRI (Persero),</div>
+          <div class="sign-space"></div>
+          <div class="sign-name">( ................................. )</div>
+        </div>
+        <div class="sign-col">
+          <div>Semarang, ${idDate(new Date().toISOString())}</div>
+          <div>&nbsp;</div>
+          <div>&nbsp;</div>
+          <div class="sign-space"></div>
+          <div class="sign-name">( ${dashIfEmpty(d.nama_peserta)} )</div>
+        </div>
+      </div>`
   },
   {
     id: 'tpb',
     label: 'Form TPB',
-    desc: 'Formulir Tabungan Perumahan / Pinjaman Berbantuan',
+    desc: 'Formulir Pernyataan Minat Program Taspen Proteksi Beasiswa',
     icon: '🏠',
-    docTitle: 'FORMULIR TABUNGAN PERUMAHAN / PINJAMAN BERBANTUAN (TPB)',
+    docTitle: 'FORMULIR PERNYATAAN MINAT/TIDAK MINAT MENGIKUTI PROGRAM TASPEN PROTEKSI BEASISWA (TPB)',
+    logo: ASABRI_LOGO,
     fields: [
-      {name:'nama', label:'Nama Lengkap', type:'text', required:true},
-      {name:'pangkat', label:'Pangkat', type:'text', required:true},
-      {name:'nrp', label:'NRP', type:'text', required:true},
-      {name:'satuan', label:'Satuan Kerja', type:'text', required:true},
-      {name:'alamat', label:'Alamat', type:'textarea', required:true},
-      {name:'no_hp', label:'No. HP / WA', type:'text', required:true},
-      {name:'tujuan_pinjaman', label:'Tujuan Penggunaan', type:'select', required:true,
-        options:['Pembangunan Rumah','Renovasi Rumah','Pembelian Rumah','Pelunasan KPR','Lainnya']},
-      {name:'jumlah_pengajuan', label:'Jumlah Pengajuan (Rp)', type:'text', required:true},
-      {name:'bank', label:'Nama Bank', type:'text', required:true},
-      {name:'no_rekening', label:'No. Rekening', type:'text', required:true}
-    ]
+      {name:'nama_peserta', label:'Nama Peserta', type:'text', required:true},
+      {name:'nrp_nip', label:'NRP/NIP', type:'text', required:true},
+      {name:'nomor_kpa', label:'Nomor KPA', type:'text', required:false},
+      {name:'nama_ahli_waris', label:'Nama Ahli Waris', type:'text', required:true},
+      {name:'nik', label:'NIK', type:'text', required:true},
+      {name:'ttl', label:'Tempat & Tanggal Lahir', type:'text', required:true},
+      {name:'no_hp', label:'Nomor HP', type:'text', required:true},
+      {name:'email', label:'Alamat Email', type:'text', required:false},
+      {name:'nama_anak1', label:'Nama Anak 1', type:'text', required:false},
+      {name:'nama_anak2', label:'Nama Anak 2', type:'text', required:false},
+      {name:'estimasi_premi', label:'Estimasi Maksimal Premi', type:'text', required:false},
+      {name:'minat', label:'Pernyataan Minat', type:'select', required:true,
+        options:['Berminat mengetahui lebih lanjut & memberi izin data disampaikan ke TLRO','Tidak berminat & tidak memberi izin data disampaikan ke TLRO']}
+    ],
+    printBody: (d) => `
+      <div class="doc-title">FORMULIR PERNYATAAN MINAT/TIDAK MINAT</div>
+      <div class="doc-title2">MENGIKUTI PROGRAM TASPEN PROTEKSI BEASISWA (TPB)</div>
+      <div class="statement">Yang bertanda tangan dibawah ini:</div>
+      <table class="numbered-table">
+        <tr><td class="lbl">Nama Peserta</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_peserta)}</td></tr>
+        <tr><td class="lbl">NRP/NIP</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nrp_nip)}</td></tr>
+        <tr><td class="lbl">Nomor KPA</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nomor_kpa)}</td></tr>
+        <tr><td class="lbl">Nama Ahli Waris</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_ahli_waris)}</td></tr>
+        <tr><td class="lbl">NIK</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nik)}</td></tr>
+        <tr><td class="lbl">Tempat & Tanggal Lahir</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.ttl)}</td></tr>
+        <tr><td class="lbl">Nomor HP</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.no_hp)}</td></tr>
+        <tr><td class="lbl">Alamat Email</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.email)}</td></tr>
+        <tr><td class="lbl">Nama Anak 1</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_anak1)}</td></tr>
+        <tr><td class="lbl">Nama Anak 2</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_anak2)}</td></tr>
+        <tr><td class="lbl">Estimasi Maksimal Premi</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.estimasi_premi)}</td></tr>
+      </table>
+      <div class="statement">dengan ini menyatakan bahwa:</div>
+      <ol class="legal-list">
+        <li>sudah mendapatkan informasi dari Customer Service Officer (CSO) PT ASABRI (Persero) terkait manfaat Taspen Proteksi Beasiswa (TPB) yang sudah bekerja sama antara PT ASABRI (Persero) dengan PT Asuransi Jiwa Taspen. Pernyataan saya: <strong>${dashIfEmpty(d.minat)}</strong>, kepada Taspen Life Relation Officer (TLRO) PT Asuransi Jiwa Taspen.</li>
+        <li>(apabila memberikan izin), bersedia dihubungi oleh petugas Taspen Life Relation Officer (TLRO) untuk mendapatkan penjelasan lebih lanjut tentang Program Taspen Proteksi Beasiswa (TPB) serta proses yang perlu dilakukan untuk mengikuti program tersebut.</li>
+      </ol>
+      <div class="statement">Demikian pernyataan ini saya buat dengan sebenar-benarnya dalam keadaan sadar dan tanpa paksaan dari pihak manapun.</div>
+      <div class="sign-block two-col">
+        <div class="sign-col">
+          <div>Mengetahui,</div>
+          <div>Customer Service Officer (CSO)</div>
+          <div>PT ASABRI (Persero),</div>
+          <div class="sign-space"></div>
+          <div class="sign-name">( ................................. )</div>
+        </div>
+        <div class="sign-col">
+          <div>Semarang, ${idDate(new Date().toISOString())}</div>
+          <div>&nbsp;</div>
+          <div>&nbsp;</div>
+          <div class="sign-space"></div>
+          <div class="sign-name">( ${dashIfEmpty(d.nama_peserta)} )</div>
+        </div>
+      </div>`
   },
   {
     id: 'belum-menikah-lagi',
     label: 'Surat Pernyataan Belum Menikah Lagi',
-    desc: 'Surat keterangan dari Kelurahan bahwa yang bersangkutan belum menikah lagi',
+    desc: 'Surat keterangan dari Kelurahan bahwa yang bersangkutan belum/tidak menikah lagi',
     icon: '📄',
-    docTitle: 'SURAT PERNYATAAN BELUM MENIKAH LAGI',
+    docTitle: 'SURAT KETERANGAN TIDAK/BELUM MENIKAH LAGI DARI PAMONGPRAJA',
+    logo: ASABRI_LOGO,
     fields: [
-      {name:'nama', label:'Nama Lengkap', type:'text', required:true},
-      {name:'nik', label:'NIK', type:'text', required:true},
-      {name:'tempat_lahir', label:'Tempat Lahir', type:'text', required:true},
-      {name:'tanggal_lahir', label:'Tanggal Lahir', type:'date', required:true},
-      {name:'pekerjaan', label:'Pekerjaan', type:'text', required:false},
-      {name:'alamat', label:'Alamat Lengkap', type:'textarea', required:true},
-      {name:'nama_almarhum_suami_istri', label:'Nama Almarhum Suami/Istri', type:'text', required:true},
-      {name:'tanggal_wafat_pasangan', label:'Tanggal Wafat Pasangan', type:'date', required:true}
-    ]
+      {name:'nama_lurah', label:'Nama Lurah/Kepala Desa', type:'text', required:true},
+      {name:'wilayah_lurah', label:'Lurah/Kepala Desa (wilayah)', type:'text', required:true},
+      {name:'nama_pemohon', label:'Nama Pemohon (Janda/Duda)', type:'text', required:true},
+      {name:'alamat_pemohon', label:'Alamat Pemohon', type:'textarea', required:true},
+      {name:'status_jd', label:'Status', type:'select', required:true, options:['Janda','Duda']},
+      {name:'nama_almarhum', label:'Nama Almarhum/Almarhumah', type:'text', required:true},
+      {name:'pangkat_gol', label:'Pangkat/Golongan Almarhum', type:'text', required:true},
+      {name:'nrp_nip_npp', label:'NRP/NIP/NPP Almarhum', type:'text', required:true},
+      {name:'no_pensiun', label:'Nomor Pensiun', type:'text', required:false},
+      {name:'tgl_meninggal', label:'Tanggal Meninggal Dunia/Tewas', type:'date', required:true}
+    ],
+    printBody: (d) => `
+      <div class="doc-note-top">Surat Keterangan tidak/belum <u>menikah</u> lagi dari Pamongpraja</div>
+      <div class="doc-title" style="margin-top:16pt">SURAT KETERANGAN</div>
+      <div class="statement" style="margin-top:16pt">Yang bertanda tangan di bawah ini :</div>
+      <table class="numbered-table">
+        <tr><td class="lbl">Nama</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_lurah)}</td></tr>
+        <tr><td class="lbl">Jabatan</td><td class="colon">:</td><td class="val">Lurah/Kepala Desa ${dashIfEmpty(d.wilayah_lurah)}</td></tr>
+      </table>
+      <div class="statement">Menerangkan dengan sesungguhnya</div>
+      <table class="numbered-table">
+        <tr><td class="lbl">Nama</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_pemohon)}</td></tr>
+        <tr><td class="lbl">Alamat</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.alamat_pemohon)}</td></tr>
+      </table>
+      <div class="statement">Adalah ${dashIfEmpty(d.status_jd).toLowerCase()} dari almarhum/almarhumah yang semasa hidupnya:</div>
+      <table class="numbered-table">
+        <tr><td class="lbl">Nama</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_almarhum)}</td></tr>
+        <tr><td class="lbl">Pangkat/Golongan</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.pangkat_gol)}</td></tr>
+        <tr><td class="lbl">NRP/NIP/NPP</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nrp_nip_npp)}</td></tr>
+        <tr><td class="lbl">Nomor Pensiun</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.no_pensiun)}</td></tr>
+        <tr><td class="lbl">Instansi</td><td class="colon">:</td><td class="val">SATBRIMOB POLDA JATENG</td></tr>
+        <tr><td class="lbl">Meninggal dunia/tewas pada tanggal</td><td class="colon">:</td><td class="val">${idDate(d.tgl_meninggal)}</td></tr>
+      </table>
+      <div class="statement">Berdasarkan data yang ada pada kami yang bersangkutan tidak/belum menikah lagi.</div>
+      <div class="statement">Demikian pernyataan saya dan saya bertanggungjawab sepenuhnya atas kebenaran keterangan tersebut.</div>
+      <div class="sign-block">
+        <div class="sign-col">
+          <div>................., ${idDate(new Date().toISOString())}</div>
+          <div class="sign-space"></div>
+          <div class="sign-name">Lurah/Kepala Desa ${dashIfEmpty(d.wilayah_lurah)}</div>
+          <div class="sign-name">( ${dashIfEmpty(d.nama_lurah)} )</div>
+        </div>
+      </div>`
   },
   {
     id: 'ku1',
     label: 'Surat KU 1',
-    desc: 'Daftar Keluarga Penerima Tunjangan',
+    desc: 'Surat Keterangan Tanggungan Keluarga (KU-1)',
     icon: '👨‍👩‍👧‍👦',
-    docTitle: 'DAFTAR KELUARGA PENERIMA TUNJANGAN (KU-1)',
+    docTitle: 'BENTUK KU-1 — SURAT KETERANGAN TANGGUNGAN KELUARGA',
+    logo: '',
     fields: [
-      {name:'nama_pegawai', label:'Nama Pegawai / Pensiunan', type:'text', required:true},
-      {name:'pangkat', label:'Pangkat', type:'text', required:true},
-      {name:'nrp', label:'NRP', type:'text', required:true},
-      {name:'satuan', label:'Satuan Kerja', type:'text', required:true},
+      {name:'nama', label:'Nama', type:'text', required:true},
+      {name:'ttl', label:'Tempat / Tanggal Lahir', type:'text', required:true},
+      {name:'pangkat_gol', label:'Pangkat / Gol / Ruang', type:'text', required:true},
+      {name:'nrp_nbi_nip', label:'NRP / NBI / NIP', type:'text', required:true},
+      {name:'jabatan_kesatuan', label:'Jabatan / Kesatuan', type:'text', required:true},
+      {name:'gaji_pokok', label:'Gaji Pokok (Rp)', type:'text', required:false},
       {name:'alamat', label:'Alamat', type:'textarea', required:true},
-      {name:'daftar_keluarga', label:'Daftar Anggota Keluarga (Nama — Hubungan — Tgl Lahir, satu baris per orang)', type:'textarea', required:true,
-        hint:'Contoh: Siti Aminah — Istri — 12-05-1980'}
-    ]
+      {name:'status_kawin', label:'Status (Kawin/Tidak Kawin/Janda/Duda)', type:'select', required:true,
+        options:['Kawin','Tidak Kawin','Janda','Duda']},
+      {name:'nama_istri_suami', label:'Nama Istri/Suami', type:'text', required:false},
+      {name:'ttl_istri_suami', label:'Tempat dan Tanggal Lahir Istri/Suami', type:'text', required:false},
+      {name:'keterangan_hak', label:'Keterangan (Berhak/Tidak Berhak Tunjangan)', type:'select', required:true,
+        options:['BERHAK MENDAPAT TUNJANGAN','TIDAK BERHAK']},
+      {name:'tanggal_tanggungan', label:'Sejak Tanggal Menjadi Tanggungan', type:'date', required:false},
+      {name:'daftar_keluarga', label:'Daftar Anggota Keluarga Tanggungan (satu baris per orang)', type:'textarea', required:true,
+        hint:'Format: Nama — Lk/Pr — Tgl Lahir — Hubungan Keluarga — Tempat Tinggal — Keterangan'}
+    ],
+    printBody: (d) => {
+      const rows = listRows(d.daftar_keluarga);
+      const famRows = rows.map((r,i) => {
+        const parts = r.split('—').map(s=>s.trim());
+        const [nama='',lp='',tgl='',hub='',tinggal='',ket=''] = parts;
+        return `<tr><td class="no">${i+1}.</td><td>${nama||'-'}</td><td>${lp||'-'}</td><td>${tgl||'-'}</td><td>${hub||'-'}</td><td>${tinggal||'-'}</td><td>${ket||'-'}</td></tr>`;
+      }).join('') || `<tr><td class="no">1.</td><td colspan="6">-</td></tr>`;
+      return `
+      <div class="doc-title">BENTUK KU-1</div>
+      <div class="doc-title2">SURAT KETERANGAN TANGGUNGAN KELUARGA</div>
+      <div class="statement" style="margin-top:16pt">Yang bertanda tangan di bawah ini</div>
+      <table class="numbered-table">
+        <tr><td class="no">1.</td><td class="lbl">Nama</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama)}</td></tr>
+        <tr><td class="no">2.</td><td class="lbl">Tempat / tanggal lahir</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.ttl)}</td></tr>
+        <tr><td class="no">3.</td><td class="lbl">Pangkat / Gol / Ruang</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.pangkat_gol)}</td></tr>
+        <tr><td class="no">4.</td><td class="lbl">NRP / NBI / NIP</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nrp_nbi_nip)}</td></tr>
+        <tr><td class="no">5.</td><td class="lbl">Jabatan / Kesatuan</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.jabatan_kesatuan)}</td></tr>
+        <tr><td class="no">6.</td><td class="lbl">Gaji Pokok</td><td class="colon">:</td><td class="val">Rp. ${dashIfEmpty(d.gaji_pokok)}</td></tr>
+        <tr><td class="no">7.</td><td class="lbl">Alamat</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.alamat)}</td></tr>
+        <tr><td class="no">8-10.</td><td class="lbl">Kawin/Tidak kawin/Janda/Duda</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.status_kawin)}</td></tr>
+        <tr><td class="no">11.</td><td class="lbl">Nama istri/suami</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_istri_suami)}</td></tr>
+        <tr><td class="no">12.</td><td class="lbl">Tempat dan tanggal lahir</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.ttl_istri_suami)}</td></tr>
+        <tr><td class="no">13.</td><td class="lbl">Keterangan</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.keterangan_hak)}</td></tr>
+      </table>
+      <div class="statement">Menerangkan dengan penuh sumpah/berjanji, bahwa keluarga yang namanya tersebut di bawah ini benar-benar sejak tanggal (${idDate(d.tanggal_tanggungan)}) menjadi tanggungan saya penuh,</div>
+      <table class="fam-table">
+        <thead><tr><th>No</th><th>Nama</th><th>Lk/Pr</th><th>Tgl Lahir</th><th>Hubungan Keluarga</th><th>Tempat Tinggal</th><th>Keterangan</th></tr></thead>
+        <tbody>${famRows}</tbody>
+      </table>
+      <div class="statement">Jika surat keterangan ini ternyata tidak benar, saya sanggup menjalani akibat yang diambil oleh Pemerintah. Jumlah keluarga tertanggung: ${rows.length || '-'}.</div>
+      <div class="sign-block">
+        <div class="sign-col">
+          <div>Semarang, ${idDate(new Date().toISOString())}</div>
+          <div>Yang Membuat Pernyataan,</div>
+          <div class="sign-space"></div>
+          <div class="sign-name">( ${dashIfEmpty(d.nama)} )</div>
+        </div>
+      </div>`;
+    }
   },
   {
     id: 'alamat-pensiun',
     label: 'Surat Penunjukan Alamat Pensiun',
-    desc: 'Surat keterangan penunjukan alamat setelah pensiun',
+    desc: 'Surat Pernyataan Penunjukan Alamat untuk Penerimaan Pensiun',
     icon: '📍',
-    docTitle: 'SURAT PERNYATAAN PENUNJUKAN ALAMAT PENSIUN',
+    docTitle: 'SURAT PERNYATAAN PENUNJUKAN ALAMAT UNTUK PENERIMAAN PENSIUN',
+    logo: '',
     fields: [
-      {name:'nama', label:'Nama Lengkap', type:'text', required:true},
-      {name:'pangkat', label:'Pangkat', type:'text', required:true},
-      {name:'nrp', label:'NRP', type:'text', required:true},
-      {name:'satuan', label:'Satuan Kerja', type:'text', required:true},
-      {name:'alamat_pensiun', label:'Alamat Domisili Setelah Pensiun', type:'textarea', required:true},
-      {name:'kelurahan', label:'Kelurahan / Desa', type:'text', required:true},
+      {name:'nama_pemohon', label:'Nama Pemohon (Ahli Waris/Istri)', type:'text', required:true},
+      {name:'umur', label:'Umur', type:'text', required:true},
+      {name:'status_hub', label:'Status (Ahli Waris/Istri dari Almarhum)', type:'select', required:true,
+        options:['Ahli Waris','Istri']},
+      {name:'nama_almarhum', label:'Nama Almarhum', type:'text', required:true},
+      {name:'pangkat_nrp', label:'Pangkat / NRP', type:'text', required:true},
+      {name:'ttl_almarhum', label:'Tempat / Tanggal Lahir Almarhum', type:'text', required:false},
+      {name:'jabatan', label:'Jabatan', type:'text', required:false},
+      {name:'jalan', label:'Alamat Pensiun — Jalan', type:'text', required:true},
+      {name:'kelurahan', label:'Kelurahan', type:'text', required:true},
       {name:'kecamatan', label:'Kecamatan', type:'text', required:true},
-      {name:'kabupaten_kota', label:'Kabupaten / Kota', type:'text', required:true},
-      {name:'no_hp', label:'No. HP / WA', type:'text', required:true}
-    ]
+      {name:'kabupaten_kota', label:'Kota/Kabupaten', type:'text', required:true},
+      {name:'provinsi', label:'Provinsi', type:'text', required:true}
+    ],
+    printBody: (d) => `
+      <div class="kop-polri">
+        <div>KEPOLISIAN NEGARA REPUBLIK INDONESIA</div>
+        <div>DAERAH JAWA TENGAH</div>
+        <div>SATUAN BRIMOB</div>
+      </div>
+      <div class="doc-title" style="margin-top:20pt">SURAT PERNYATAAN PENUNJUKAN ALAMAT</div>
+      <div class="doc-title2">UNTUK PENERIMAAN PENSIUN</div>
+      <div class="statement" style="margin-top:20pt">Yang bertanda tangan dibawah ini, saya :</div>
+      <table class="numbered-table">
+        <tr><td class="lbl">Nama</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_pemohon)}</td></tr>
+        <tr><td class="lbl">Umur</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.umur)}</td></tr>
+      </table>
+      <div class="statement">${dashIfEmpty(d.status_hub)} dari almarhum yang semasa hidupnya:</div>
+      <table class="numbered-table">
+        <tr><td class="lbl">Nama</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_almarhum)}</td></tr>
+        <tr><td class="lbl">Pangkat / Nrp.</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.pangkat_nrp)}</td></tr>
+        <tr><td class="lbl">Tempat / tanggal lahir</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.ttl_almarhum)}</td></tr>
+        <tr><td class="lbl">Jabatan</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.jabatan)}</td></tr>
+        <tr><td class="lbl">Kesatuan</td><td class="colon">:</td><td class="val">Satbrimob Polda Jateng</td></tr>
+      </table>
+      <div class="statement">Dengan ini menerangkan bahwa alamat untuk melaksanakan pensiun sesuai dengan KTP adalah sebagai berikut:</div>
+      <div class="statement" style="text-align:center;font-weight:600">
+        Jl. ${dashIfEmpty(d.jalan)}, Kel. ${dashIfEmpty(d.kelurahan)}, Kec. ${dashIfEmpty(d.kecamatan)}, Kota/Kab. ${dashIfEmpty(d.kabupaten_kota)}, Prov. ${dashIfEmpty(d.provinsi)}
+      </div>
+      <div class="statement">Demikian untuk menjadikan maklum.</div>
+      <div class="sign-block">
+        <div class="sign-col">
+          <div>Semarang, ${idDate(new Date().toISOString())}</div>
+          <div class="sign-space"></div>
+          <div class="sign-name">( ${dashIfEmpty(d.nama_pemohon)} )</div>
+        </div>
+      </div>`
   },
   {
     id: 'ahli-waris',
@@ -809,16 +1139,48 @@ const FILL_FORMS = [
     desc: 'Surat keterangan susunan ahli waris yang disahkan oleh Lurah / Kepala Desa',
     icon: '⚖️',
     docTitle: 'SURAT KETERANGAN AHLI WARIS',
+    logo: ASABRI_LOGO,
     fields: [
       {name:'nama_pewaris', label:'Nama Pewaris (Almarhum/Almarhumah)', type:'text', required:true},
       {name:'nik_pewaris', label:'NIK Pewaris', type:'text', required:false},
       {name:'tanggal_wafat', label:'Tanggal Wafat', type:'date', required:true},
       {name:'alamat_terakhir', label:'Alamat Terakhir Pewaris', type:'textarea', required:true},
-      {name:'daftar_ahli_waris', label:'Daftar Ahli Waris (Nama — Hubungan — Usia, satu baris per orang)', type:'textarea', required:true,
-        hint:'Contoh: Budi Santoso — Anak Kandung — 24 tahun'},
-      {name:'disahkan_oleh', label:'Disahkan Oleh (Lurah/Kepala Desa)', type:'text', required:true},
+      {name:'daftar_ahli_waris', label:'Daftar Ahli Waris (satu baris per orang)', type:'textarea', required:true,
+        hint:'Format: Nama — Hubungan — Usia. Contoh: Budi Santoso — Anak Kandung — 24 tahun'},
+      {name:'nama_lurah', label:'Nama Lurah/Kepala Desa yang Mengesahkan', type:'text', required:true},
       {name:'kelurahan', label:'Kelurahan / Desa', type:'text', required:true}
-    ]
+    ],
+    printBody: (d) => {
+      const rows = listRows(d.daftar_ahli_waris);
+      const awRows = rows.map((r,i) => {
+        const parts = r.split('—').map(s=>s.trim());
+        const [nama='',hub='',usia=''] = parts;
+        return `<tr><td class="no">${i+1}.</td><td>${nama||'-'}</td><td>${hub||'-'}</td><td>${usia||'-'}</td></tr>`;
+      }).join('') || `<tr><td class="no">1.</td><td colspan="3">-</td></tr>`;
+      return `
+      <div class="doc-title">SURAT KETERANGAN AHLI WARIS</div>
+      <div class="statement" style="margin-top:16pt">Yang bertanda tangan di bawah ini, Lurah/Kepala Desa ${dashIfEmpty(d.kelurahan)}, menerangkan dengan sesungguhnya bahwa:</div>
+      <table class="numbered-table">
+        <tr><td class="lbl">Nama Pewaris</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nama_pewaris)}</td></tr>
+        <tr><td class="lbl">NIK Pewaris</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.nik_pewaris)}</td></tr>
+        <tr><td class="lbl">Tanggal Wafat</td><td class="colon">:</td><td class="val">${idDate(d.tanggal_wafat)}</td></tr>
+        <tr><td class="lbl">Alamat Terakhir</td><td class="colon">:</td><td class="val">${dashIfEmpty(d.alamat_terakhir)}</td></tr>
+      </table>
+      <div class="statement">Adalah benar telah meninggal dunia dan meninggalkan ahli waris sebagai berikut:</div>
+      <table class="fam-table">
+        <thead><tr><th>No</th><th>Nama Ahli Waris</th><th>Hubungan</th><th>Usia</th></tr></thead>
+        <tbody>${awRows}</tbody>
+      </table>
+      <div class="statement">Demikian surat keterangan ahli waris ini dibuat dengan sebenar-benarnya untuk dapat dipergunakan sebagaimana mestinya.</div>
+      <div class="sign-block">
+        <div class="sign-col">
+          <div>${dashIfEmpty(d.kelurahan)}, ${idDate(new Date().toISOString())}</div>
+          <div>Lurah/Kepala Desa ${dashIfEmpty(d.kelurahan)},</div>
+          <div class="sign-space"></div>
+          <div class="sign-name">( ${dashIfEmpty(d.nama_lurah)} )</div>
+        </div>
+      </div>`;
+    }
   }
 ];
 
@@ -892,13 +1254,12 @@ function closeFillPanel(id) {
   document.getElementById('fill-panel-' + id).classList.remove('active');
 }
 
-// ─── GENERATE PDF SIAP CETAK DARI FORM YANG DIISI ──────────────────────────────
+// ─── GENERATE PDF SIAP CETAK DARI FORM YANG DIISI (MENIRU LAYOUT ASLI) ─────────
 function generateFilledPdf(evt, formId) {
   evt.preventDefault();
   const def = FILL_FORMS.find(f => f.id === formId);
   if (!def) return false;
 
-  const formEl = document.getElementById('form-' + formId);
   const data = {};
   def.fields.forEach(field => {
     const el = document.getElementById(`${formId}__${field.name}`);
@@ -912,79 +1273,58 @@ function generateFilledPdf(evt, formId) {
   }
 
   const today = new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
-  const logoUrl = new URL('korps-brimob-seeklogo.png', window.location.href).href;
-
-  const formatVal = (field) => {
-    const v = data[field.name];
-    if (!v) return '-';
-    if (field.type === 'date') {
-      try { return new Date(v).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'}); }
-      catch(e){ return v; }
-    }
-    if (field.type === 'textarea' && v.includes('\n')) {
-      return v.split('\n').filter(l=>l.trim()).map((l,i)=>`${i+1}. ${l.trim()}`).join('<br>');
-    }
-    return v.replace(/\n/g,'<br>');
-  };
-
-  const rowsHtml = def.fields.map(field => `
-    <tr>
-      <td class="field-label">${field.label}</td>
-      <td class="field-colon">:</td>
-      <td class="field-value">${formatVal(field)}</td>
-    </tr>`).join('');
+  const logoHtml = def.logo
+    ? `<div class="emblem"><img src="${def.logo}" alt="Logo ASABRI" onerror="this.parentElement.style.display='none'"></div>`
+    : '';
+  const bodyHtml = def.printBody(data);
 
   const win = window.open('', '_blank');
   win.document.write(`<!DOCTYPE html><html lang="id"><head>
   <meta charset="UTF-8">
-  <title>${def.docTitle} — Khirdin Satbrimob Polda Jateng</title>
+  <title>${def.label} — Khirdin Satbrimob Polda Jateng</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:Arial,sans-serif;padding:30pt 40pt;color:#1a1a1a;font-size:11pt;line-height:1.5}
-    .kop{display:flex;align-items:center;gap:14pt;padding-bottom:10pt;border-bottom:3pt solid #0A1628;margin-bottom:18pt}
-    .emblem{width:46pt;height:46pt;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;border:2pt solid #0A1628;flex-shrink:0;overflow:hidden}
-    .emblem img{width:80%;height:80%;object-fit:contain}
-    .kop-text h1{font-size:13.5pt;font-weight:700;color:#0A1628}
-    .kop-text p{font-size:9.5pt;color:#555;margin-top:2pt}
-    .doc-title{font-size:14pt;font-weight:700;color:#0A1628;text-align:center;text-transform:uppercase;margin-bottom:2pt;text-decoration:underline}
-    .doc-sub{font-size:9pt;color:#777;text-align:center;margin-bottom:20pt}
-    .field-table{width:100%;border-collapse:collapse;margin-bottom:26pt}
-    .field-table td{padding:5pt 4pt;vertical-align:top;font-size:10.5pt}
-    .field-label{width:220pt;font-weight:600;color:#0A1628}
-    .field-colon{width:12pt}
-    .field-value{color:#222}
-    .statement{font-size:10.5pt;margin:16pt 0;text-align:justify;line-height:1.7}
-    .sign-block{display:flex;justify-content:flex-end;margin-top:36pt}
-    .sign-col{text-align:center;font-size:10.5pt;width:200pt}
-    .sign-space{height:60pt}
-    .footer{margin-top:30pt;padding-top:10pt;border-top:0.5pt solid #ccc;display:flex;justify-content:space-between;font-size:8.5pt;color:#888}
-    @media print{body{padding:20pt 30pt}}
+    body{font-family:Arial,sans-serif;padding:26pt 38pt;color:#1a1a1a;font-size:10.5pt;line-height:1.5}
+    .kop-brand{display:flex;align-items:center;gap:12pt;margin-bottom:10pt}
+    .emblem{width:52pt;flex-shrink:0}
+    .emblem img{width:100%;height:auto;object-fit:contain}
+    .kop-polri{text-align:center;font-weight:700;font-size:11pt;line-height:1.5;margin-bottom:6pt}
+    .asabri-top{text-align:right;font-size:7.5pt;color:#555;border:0.75pt solid #999;padding:4pt 8pt;margin-bottom:10pt;max-width:260pt;margin-left:auto}
+    .doc-note-top{font-size:9.5pt;line-height:1.4}
+    .doc-title{font-size:12.5pt;font-weight:700;color:#0A1628;text-align:center;text-transform:uppercase;margin-top:6pt}
+    .doc-title.box-title{border:1pt solid #333;padding:5pt;margin:8pt 0}
+    .doc-title2{font-size:11pt;font-weight:700;color:#0A1628;text-align:center;text-transform:uppercase;margin-bottom:4pt}
+    .section-lbl{font-weight:700;font-size:10.5pt;color:#0A1628;margin-top:10pt;margin-bottom:4pt}
+    .statement{font-size:10.5pt;margin:10pt 0;text-align:justify;line-height:1.6}
+    .numbered-table{width:100%;border-collapse:collapse;margin:6pt 0}
+    .numbered-table td{padding:3pt 4pt;vertical-align:top;font-size:10pt}
+    .numbered-table .no{width:20pt;font-weight:600;color:#B87A10}
+    .numbered-table .lbl{width:190pt;font-weight:600;color:#0A1628}
+    .numbered-table .lbl.sub{padding-left:14pt;font-weight:500;color:#333}
+    .numbered-table .colon{width:10pt}
+    .numbered-table .val{color:#222}
+    .legal-list{margin:8pt 0 8pt 20pt;font-size:9.8pt;line-height:1.55;text-align:justify}
+    .legal-list li{margin-bottom:6pt}
+    .fam-table{width:100%;border-collapse:collapse;margin:8pt 0}
+    .fam-table th,.fam-table td{border:0.75pt solid #888;padding:4pt 5pt;font-size:9.3pt;text-align:left}
+    .fam-table th{background:#eef1f7}
+    .fam-table .no{width:22pt;text-align:center}
+    .warning-box{border:1.5pt solid #222;padding:8pt 10pt;font-size:9pt;margin:14pt 0;max-width:260pt;text-align:center}
+    .dist-note{font-size:8.5pt;color:#444;margin:10pt 0}
+    .sign-block{display:flex;justify-content:flex-end;margin-top:24pt}
+    .sign-block.two-col{justify-content:space-between}
+    .sign-col{text-align:center;font-size:10pt;width:220pt;line-height:1.5}
+    .sign-space{height:50pt}
+    .sign-name{font-weight:700;text-decoration:underline}
+    .footer-note{margin-top:26pt;padding-top:8pt;border-top:0.5pt solid #ccc;display:flex;justify-content:space-between;font-size:8pt;color:#888}
+    @media print{body{padding:18pt 26pt}}
   </style>
   </head><body>
-  <div class="kop">
-    <div class="emblem"><img src="${logoUrl}" alt="Logo Brimob"></div>
-    <div class="kop-text">
-      <h1>Khirdin Satbrimob Polda Jateng</h1>
-      <p>Sistem Informasi Administrasi Internal &nbsp;|&nbsp; Tanggal cetak: ${today}</p>
-    </div>
+  <div class="kop-brand">
+    ${logoHtml}
   </div>
-  <div class="doc-title">${def.docTitle}</div>
-  <div class="doc-sub">${def.desc}</div>
-  <table class="field-table">${rowsHtml}</table>
-  <div class="statement">
-    Demikian data pada formulir ini diisi dengan sebenar-benarnya untuk digunakan sebagai kelengkapan
-    berkas administrasi. Apabila di kemudian hari terdapat kekeliruan data, kami bersedia melakukan
-    perbaikan sesuai ketentuan yang berlaku.
-  </div>
-  <div class="sign-block">
-    <div class="sign-col">
-      <div>Semarang, ${today}</div>
-      <div>Yang Membuat Pernyataan,</div>
-      <div class="sign-space"></div>
-      <div style="font-weight:700;text-decoration:underline">${data[def.fields[0].name] || '.......................'}</div>
-    </div>
-  </div>
-  <div class="footer">
+  ${bodyHtml}
+  <div class="footer-note">
     <span>Khirdin Satbrimob Polda Jateng</span>
     <span>Dicetak: ${today}</span>
   </div>
