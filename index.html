@@ -157,6 +157,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--light);color:va
 .fam-add-btn{display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--blue);border:1.5px dashed var(--blue);padding:9px 16px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;width:100%;justify-content:center;margin-bottom:14px}
 .fam-add-btn:hover{background:#EEF4FF}
 
+/* Rank (pangkat/golongan) dropdown builder */
+.rank-builder{display:grid;grid-template-columns:1.4fr 1fr;gap:0 10px}
+.rank-builder input{grid-column:1/-1;margin-top:10px}
+@media(max-width:480px){.rank-builder{grid-template-columns:1fr}.rank-builder input{margin-top:8px}}
+
+/* Alamat "sama dengan atas / tulis sendiri" builder */
+.addr-same-builder select{width:100%}
+.addr-same-custom{width:100%;resize:vertical;min-height:64px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--text);background:#fff}
+.addr-same-custom:focus{outline:none;border-color:var(--blue)}
+
 .footer{text-align:center;padding:20px;color:var(--text-muted);font-size:12px;border-top:1px solid var(--border);margin-top:16px}
 
 @media(max-width:600px){
@@ -701,6 +711,35 @@ function listRows(text) {
   return text.split('\n').map(l => l.trim()).filter(Boolean);
 }
 
+// ─── DAFTAR PANGKAT POLRI (Bharada s.d. Brigjen Pol) & GOLONGAN/RUANG ──────────
+const POLRI_RANKS = [
+  'Bhayangkara Dua (Bharada)',
+  'Bhayangkara Satu (Bharatu)',
+  'Bhayangkara Kepala (Bharaka)',
+  'Ajun Brigadir Polisi Dua (Abripda)',
+  'Ajun Brigadir Polisi Satu (Abriptu)',
+  'Ajun Brigadir Polisi (Abrip)',
+  'Brigadir Polisi Dua (Bripda)',
+  'Brigadir Polisi Satu (Briptu)',
+  'Brigadir Polisi (Brigadir)',
+  'Brigadir Polisi Kepala (Bripka)',
+  'Ajun Inspektur Polisi Dua (Aipda)',
+  'Ajun Inspektur Polisi Satu (Aiptu)',
+  'Inspektur Polisi Dua (Ipda)',
+  'Inspektur Polisi Satu (Iptu)',
+  'Ajun Komisaris Polisi (AKP)',
+  'Komisaris Polisi (Kompol)',
+  'Ajun Komisaris Besar Polisi (AKBP)',
+  'Komisaris Besar Polisi (Kombes Pol)',
+  'Brigadir Jenderal Polisi (Brigjen Pol)'
+];
+const GOLONGAN_LIST = [
+  'I/a','I/b','I/c','I/d',
+  'II/a','II/b','II/c','II/d',
+  'III/a','III/b','III/c','III/d',
+  'IV/a','IV/b','IV/c','IV/d','IV/e'
+];
+
 const FILL_FORMS = [
   {
     id: 'sp3r-asabri',
@@ -712,7 +751,7 @@ const FILL_FORMS = [
     fields: [
       {name:'nama_peserta', label:'Nama Peserta', type:'text', required:true},
       {name:'nrp_nip', label:'NRP/NIP', type:'text', required:true},
-      {name:'pangkat', label:'Pangkat', type:'text', required:true},
+      {name:'pangkat', label:'Pangkat', type:'rank', required:true},
       {name:'nik', label:'NIK', type:'text', required:true},
       {name:'nomor_pensiun', label:'Nomor Pensiun', type:'text', required:false},
       {name:'nama_penerima', label:'Nama Penerima Pensiun', type:'text', required:true},
@@ -1030,7 +1069,7 @@ const FILL_FORMS = [
       {name:'alamat_pemohon', label:'Alamat Pemohon', type:'textarea', required:true},
       {name:'status_jd', label:'Status', type:'select', required:true, options:['Janda','Duda']},
       {name:'nama_almarhum', label:'Nama Almarhum/Almarhumah', type:'text', required:true},
-      {name:'pangkat_gol', label:'Pangkat/Golongan Almarhum', type:'text', required:true},
+      {name:'pangkat_gol', label:'Pangkat/Golongan Almarhum', type:'rank', required:true},
       {name:'nrp_nip_npp', label:'NRP/NIP/NPP Almarhum', type:'text', required:true},
       {name:'no_pensiun', label:'Nomor Pensiun', type:'text', required:false},
       {name:'tgl_meninggal', label:'Tanggal Meninggal Dunia/Tewas', type:'date', required:true}
@@ -1078,7 +1117,7 @@ const FILL_FORMS = [
     fields: [
       {name:'nama', label:'Nama', type:'text', required:true},
       {name:'ttl', label:'Tempat / Tanggal Lahir', type:'text', required:true},
-      {name:'pangkat_gol', label:'Pangkat / Gol / Ruang', type:'text', required:true},
+      {name:'pangkat_gol', label:'Pangkat / Gol / Ruang', type:'rank', required:true, rankExtraLabel:'Ruang (opsional)'},
       {name:'nrp_nbi_nip', label:'NRP / NBI / NIP', type:'text', required:true},
       {name:'jabatan_kesatuan', label:'Jabatan / Kesatuan', type:'text', required:true},
       {name:'gaji_pokok', label:'Gaji Pokok (Rp)', type:'text', required:false},
@@ -1141,7 +1180,7 @@ const FILL_FORMS = [
       {name:'status_hub', label:'Status (Ahli Waris/Istri dari Almarhum)', type:'select', required:true,
         options:['Ahliwaris','Istri']},
       {name:'nama_almarhum', label:'Nama Almarhum', type:'text', required:true},
-      {name:'pangkat_nrp', label:'Pangkat / NRP', type:'text', required:true},
+      {name:'pangkat_nrp', label:'Pangkat / NRP', type:'rank', required:true, rankExtraLabel:'NRP'},
       {name:'ttl_almarhum', label:'Tempat / Tanggal Lahir Almarhum', type:'text', required:false},
       {name:'jabatan', label:'Jabatan', type:'text', required:false},
       {name:'alamat_lengkap', label:'Alamat Pensiun Sesuai KTP (satu baris lengkap)', type:'textarea', required:true,
@@ -1191,7 +1230,7 @@ const FILL_FORMS = [
     logo: ASABRI_LOGO,
     fields: [
       {name:'nama_peserta', label:'Nama Lengkap Peserta ASABRI (Almarhum/Almarhumah)', type:'text', required:true},
-      {name:'pangkat_gol_nrp', label:'Pangkat / Golongan / NRP / NIP', type:'text', required:true},
+      {name:'pangkat_gol_nrp', label:'Pangkat / Golongan / NRP / NIP', type:'rank', required:true, rankExtraLabel:'NRP / NIP'},
       {name:'no_ktpa', label:'Kartu Tanda Peserta ASABRI Nomor', type:'text', required:false},
       {name:'ttl_peserta', label:'Tanggal & Tempat Lahir', type:'text', required:false},
       {name:'kesatuan', label:'Kesatuan / Instansi Terakhir', type:'text', required:true},
@@ -1200,19 +1239,14 @@ const FILL_FORMS = [
       {name:'tempat_meninggal', label:'Tempat Meninggal Dunia', type:'text', required:false},
       {name:'nama_pasangan', label:'Nama Istri/Suami', type:'text', required:false},
       {name:'pekerjaan_pasangan', label:'Pekerjaan Istri/Suami', type:'text', required:false},
-      {name:'alamat_sekarang', label:'Alamat Sekarang Istri/Suami', type:'textarea', required:false},
-      {name:'daftar_anak', label:'Daftar Anak / Ahli Waris (satu baris per orang)', type:'textarea', required:true,
-        hint:'Format: Nama — Tanggal Lahir — Hubungan Keluarga — Keterangan'},
+      {name:'alamat_sekarang', label:'Alamat Sekarang Istri/Suami', type:'address-same', required:false, sameAsField:'alamat_terakhir'},
+      {name:'daftar_anak', label:'Daftar Anak / Ahli Waris (satu baris per orang)', type:'heir-table', required:true, sameAsField:'alamat_terakhir'},
       {name:'nama_lurah', label:'Nama Lurah/Kepala Desa yang Mengesahkan', type:'text', required:true},
       {name:'kelurahan', label:'Kelurahan / Desa', type:'text', required:true}
     ],
     printBody: (d) => {
-      const rows = listRows(d.daftar_anak);
-      const awRows = rows.map((r,i) => {
-        const parts = r.split('—').map(s=>s.trim());
-        const [nama='',tgl='',hub='',ket=''] = parts;
-        return `<tr><td class="no">${i+1}.</td><td>${nama||'-'}</td><td>${tgl||'-'}</td><td>${hub||'-'}</td><td>${ket||'-'}</td></tr>`;
-      }).join('') || `<tr><td class="no">1.</td><td colspan="4">-</td></tr>`;
+      const rows = Array.isArray(d.daftar_anak) ? d.daftar_anak : [];
+      const awRows = rows.map((r,i) => `<tr><td class="no">${i+1}.</td><td>${r.nama||'-'}</td><td>${r.tgl ? idDate(r.tgl) : '-'}</td><td>${r.hub||'-'}</td><td>${r.tinggal||'-'}</td><td>${r.ket||'-'}</td></tr>`).join('') || `<tr><td class="no">1.</td><td colspan="5">-</td></tr>`;
       return `
       <div class="doc-title" style="text-decoration:underline;text-transform:uppercase">Keterangan Ahli Waris</div>
       <div class="statement" style="margin-top:16pt;margin-bottom:2pt">Yang bertanda tangan di bawah ini :</div>
@@ -1240,7 +1274,7 @@ const FILL_FORMS = [
       </table>
       <div class="statement" style="margin-top:8pt">2. Anak-anak almarhum/almarhumah (bila tidak ada anak diisi nama ayah/ibu atau saudara-saudara kandungnya) adalah sebagai berikut :</div>
       <table class="fam-table">
-        <thead><tr><th>No</th><th>N A M A</th><th>Tanggal Lahir</th><th>Hubungan Keluarga</th><th>Keterangan</th></tr></thead>
+        <thead><tr><th>No</th><th>N A M A</th><th>Tanggal Lahir</th><th>Hubungan Keluarga</th><th>Tempat Tinggal</th><th>Keterangan</th></tr></thead>
         <tbody>${awRows}</tbody>
       </table>
       <div class="statement" style="margin-top:8pt">III. Dengan sepengetahuan dan kesadaran saya sepenuhnya atas akibat-akibatnya, apa yang saya nyatakan di atas, adalah benar, lengkap, dan tidak bersyarat.</div>
@@ -1298,6 +1332,7 @@ function buildIsiForms() {
   FILL_FORMS.forEach(f => {
     f.fields.forEach(field => {
       if (field.type === 'family-table') addFamRow(f.id, field.name);
+      if (field.type === 'heir-table') addHeirRow(f.id, field.name);
     });
   });
 }
@@ -1306,11 +1341,34 @@ function renderFillField(formId, field) {
   const fid = `${formId}__${field.name}`;
   const reqMark = field.required ? '<span class="req">*</span>' : '';
   const reqAttr = field.required ? 'required' : '';
-  const wrapWide = (field.type === 'textarea' || field.type === 'family-table') ? 'style="grid-column:1/-1"' : '';
+  const wrapWide = (field.type === 'textarea' || field.type === 'family-table' || field.type === 'heir-table' || field.type === 'rank') ? 'style="grid-column:1/-1"' : '';
   let control = '';
   if (field.type === 'family-table') {
     control = `<div class="fam-builder" id="${fid}_rows"></div>
     <button type="button" class="fam-add-btn" onclick="addFamRow('${formId}','${field.name}')">➕ Tambah Anggota Keluarga</button>`;
+  } else if (field.type === 'heir-table') {
+    control = `<div class="fam-builder" id="${fid}_rows"></div>
+    <button type="button" class="fam-add-btn" onclick="addHeirRow('${formId}','${field.name}')">➕ Tambah Anak / Ahli Waris</button>`;
+  } else if (field.type === 'rank') {
+    control = `<div class="rank-builder">
+      <select id="${fid}__pangkat">
+        <option value="">— Pilih Pangkat —</option>
+        ${POLRI_RANKS.map(r => `<option value="${r}">${r}</option>`).join('')}
+      </select>
+      <select id="${fid}__golongan">
+        <option value="">— Pilih Golongan —</option>
+        ${GOLONGAN_LIST.map(g => `<option value="${g}">${g}</option>`).join('')}
+      </select>
+      ${field.rankExtraLabel ? `<input type="text" id="${fid}__extra" placeholder="${field.rankExtraLabel}">` : ''}
+    </div>`;
+  } else if (field.type === 'address-same') {
+    control = `<div class="addr-same-builder">
+      <select id="${fid}__opt" onchange="toggleAddressSame(this)">
+        <option value="sama">Sama dengan alamat di atas</option>
+        <option value="sendiri">Tulis sendiri</option>
+      </select>
+      <textarea class="addr-same-custom" id="${fid}__custom" style="display:none;margin-top:6px" placeholder="Tulis alamat"></textarea>
+    </div>`;
   } else if (field.type === 'textarea') {
     control = `<textarea id="${fid}" name="${field.name}" ${reqAttr}></textarea>`;
   } else if (field.type === 'select') {
@@ -1415,6 +1473,94 @@ function collectFamRows(formId, field) {
   }).filter(r => r.nama);
 }
 
+// ─── DAFTAR ANAK / AHLI WARIS BUILDER (dipakai Surat Keterangan Ahli Waris) ────
+function addHeirRow(formId, fieldName) {
+  const container = document.getElementById(`${formId}__${fieldName}_rows`);
+  if (!container) return;
+  const row = document.createElement('div');
+  row.className = 'fam-row';
+  row.innerHTML = `
+    <div class="fam-row-grid">
+      <div class="fam-field"><label>Nama</label><input type="text" class="heir-nama" placeholder="Nama lengkap"></div>
+      <div class="fam-field"><label>Tanggal Lahir</label><input type="date" class="heir-tgl"></div>
+      <div class="fam-field"><label>Hubungan Keluarga</label>
+        <select class="heir-hub">
+          <option value="">— Pilih —</option>
+          <option value="Anak Kandung">Anak Kandung</option>
+          <option value="Anak Tiri">Anak Tiri</option>
+          <option value="Anak Angkat">Anak Angkat</option>
+          <option value="Orang Tua Kandung">Orang Tua Kandung</option>
+          <option value="Saudara Kandung">Saudara Kandung</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+      <div class="fam-field"><label>Tempat Tinggal</label>
+        <select class="heir-tinggal-opt" onchange="toggleFamTinggal(this)">
+          <option value="sama">Sama dengan alamat di atas</option>
+          <option value="sendiri">Tulis sendiri</option>
+        </select>
+        <input type="text" class="fam-tinggal-custom" style="display:none;margin-top:6px" placeholder="Tulis alamat tempat tinggal">
+      </div>
+      <div class="fam-field"><label>Keterangan</label><input type="text" class="heir-ket" placeholder="mis. Belum menikah / Sudah bekerja"></div>
+    </div>
+    <button type="button" class="fam-remove-btn" onclick="removeFamRow(this)">🗑️ Hapus Baris</button>`;
+  container.appendChild(row);
+}
+function collectHeirRows(formId, field) {
+  const container = document.getElementById(`${formId}__${field.name}_rows`);
+  if (!container) return [];
+  const rows = [...container.querySelectorAll('.fam-row')];
+  return rows.map(row => {
+    const nama = row.querySelector('.heir-nama').value.trim();
+    const tgl = row.querySelector('.heir-tgl').value;
+    const hub = row.querySelector('.heir-hub').value;
+    const ket = row.querySelector('.heir-ket').value.trim();
+    const tinggalOpt = row.querySelector('.heir-tinggal-opt').value;
+    let tinggal = '';
+    if (tinggalOpt === 'sama') {
+      const srcEl = document.getElementById(`${formId}__${field.sameAsField || 'alamat_terakhir'}`);
+      tinggal = srcEl ? srcEl.value.trim() : '';
+    } else {
+      tinggal = row.querySelector('.fam-tinggal-custom').value.trim();
+    }
+    return {nama, tgl, hub, tinggal, ket};
+  }).filter(r => r.nama);
+}
+
+// ─── ALAMAT "SAMA DENGAN ALAMAT DI ATAS" / "TULIS SENDIRI" ─────────────────────
+function toggleAddressSame(sel) {
+  const wrap = sel.closest('.addr-same-builder');
+  const custom = wrap.querySelector('.addr-same-custom');
+  custom.style.display = sel.value === 'sendiri' ? 'block' : 'none';
+}
+function collectAddressSame(formId, field) {
+  const fid = `${formId}__${field.name}`;
+  const optEl = document.getElementById(`${fid}__opt`);
+  if (!optEl) return '';
+  if (optEl.value === 'sendiri') {
+    const c = document.getElementById(`${fid}__custom`);
+    return c ? c.value.trim() : '';
+  }
+  const srcEl = document.getElementById(`${formId}__${field.sameAsField}`);
+  return srcEl ? srcEl.value.trim() : '';
+}
+
+// ─── PANGKAT / GOLONGAN DROPDOWN VALUE COLLECTOR ───────────────────────────────
+function collectRankValue(formId, field) {
+  const fid = `${formId}__${field.name}`;
+  const pangkatEl = document.getElementById(`${fid}__pangkat`);
+  const golonganEl = document.getElementById(`${fid}__golongan`);
+  const extraEl = document.getElementById(`${fid}__extra`);
+  const pangkat = pangkatEl ? pangkatEl.value : '';
+  const golongan = golonganEl ? golonganEl.value : '';
+  const extra = extraEl ? extraEl.value.trim() : '';
+  const parts = [];
+  if (pangkat) parts.push(pangkat);
+  if (golongan) parts.push(`Gol. ${golongan}`);
+  if (extra) parts.push(extra);
+  return parts.join(' / ');
+}
+
 function openFillPanel(id) {
   document.querySelectorAll('.fill-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('fill-panel-' + id).classList.add('active');
@@ -1434,6 +1580,12 @@ function generateFilledPdf(evt, formId) {
   def.fields.forEach(field => {
     if (field.type === 'family-table') {
       data[field.name] = collectFamRows(formId, field);
+    } else if (field.type === 'heir-table') {
+      data[field.name] = collectHeirRows(formId, field);
+    } else if (field.type === 'address-same') {
+      data[field.name] = collectAddressSame(formId, field);
+    } else if (field.type === 'rank') {
+      data[field.name] = collectRankValue(formId, field);
     } else {
       const el = document.getElementById(`${formId}__${field.name}`);
       data[field.name] = el ? el.value.trim() : '';
@@ -1441,7 +1593,7 @@ function generateFilledPdf(evt, formId) {
   });
 
   const missing = def.fields.filter(f => {
-    if (f.type === 'family-table') return f.required && (!data[f.name] || data[f.name].length === 0);
+    if (f.type === 'family-table' || f.type === 'heir-table') return f.required && (!data[f.name] || data[f.name].length === 0);
     return f.required && !data[f.name];
   });
   if (missing.length) {
