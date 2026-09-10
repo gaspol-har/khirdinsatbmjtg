@@ -142,6 +142,21 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--light);color:va
 .fill-reset-btn{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--text-mid);border:1.5px solid var(--border);padding:11px 20px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
 .fill-reset-btn:hover{border-color:var(--blue);color:var(--blue)}
 
+/* FAMILY TABLE BUILDER (KU-1 dst) */
+.fam-builder{display:flex;flex-direction:column;gap:12px;margin-bottom:10px}
+.fam-row{background:#F7F9FF;border:1.5px solid var(--border);border-radius:10px;padding:14px 16px}
+.fam-row-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 14px}
+@media(max-width:700px){.fam-row-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.fam-row-grid{grid-template-columns:1fr}}
+.fam-field{margin-bottom:10px}
+.fam-field label{display:block;font-size:11.5px;font-weight:600;color:var(--text-mid);margin-bottom:4px}
+.fam-field input,.fam-field select{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;color:var(--text);background:#fff}
+.fam-field input:focus,.fam-field select:focus{outline:none;border-color:var(--blue)}
+.fam-remove-btn{display:inline-flex;align-items:center;gap:6px;background:#fff;color:#A32D2D;border:1.5px solid #F0C7C7;padding:7px 14px;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;margin-top:2px}
+.fam-remove-btn:hover{background:#FDEEEE}
+.fam-add-btn{display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--blue);border:1.5px dashed var(--blue);padding:9px 16px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;width:100%;justify-content:center;margin-bottom:14px}
+.fam-add-btn:hover{background:#EEF4FF}
+
 .footer{text-align:center;padding:20px;color:var(--text-muted);font-size:12px;border-top:1px solid var(--border);margin-top:16px}
 
 @media(max-width:600px){
@@ -1075,16 +1090,11 @@ const FILL_FORMS = [
       {name:'keterangan_hak', label:'Keterangan (Berhak/Tidak Berhak Tunjangan)', type:'select', required:true,
         options:['BERHAK MENDAPAT TUNJANGAN','TIDAK BERHAK']},
       {name:'tanggal_tanggungan', label:'Sejak Tanggal Menjadi Tanggungan', type:'date', required:false},
-      {name:'daftar_keluarga', label:'Daftar Anggota Keluarga Tanggungan (satu baris per orang)', type:'textarea', required:true,
-        hint:'Format: Nama — Lk/Pr — Tgl Lahir — Hubungan Keluarga — Tempat Tinggal — Keterangan'}
+      {name:'daftar_keluarga', label:'Daftar Anggota Keluarga Tanggungan', type:'family-table', required:true, sameAsField:'alamat'}
     ],
     printBody: (d) => {
-      const rows = listRows(d.daftar_keluarga);
-      const famRows = rows.map((r,i) => {
-        const parts = r.split('—').map(s=>s.trim());
-        const [nama='',lp='',tgl='',hub='',tinggal='',ket=''] = parts;
-        return `<tr><td class="no">${i+1}.</td><td>${nama||'-'}</td><td>${lp||'-'}</td><td>${tgl||'-'}</td><td>${hub||'-'}</td><td>${tinggal||'-'}</td><td>${ket||'-'}</td></tr>`;
-      }).join('') || `<tr><td class="no">1.</td><td colspan="6">-</td></tr>`;
+      const rows = Array.isArray(d.daftar_keluarga) ? d.daftar_keluarga : [];
+      const famRows = rows.map((r,i) => `<tr><td class="no">${i+1}.</td><td>${r.nama||'-'}</td><td>${r.lp||'-'}</td><td>${r.tgl ? idDate(r.tgl) : '-'}</td><td>${r.hub||'-'}</td><td>${r.tinggal||'-'}</td><td>${r.ket||'-'}</td></tr>`).join('') || `<tr><td class="no">1.</td><td colspan="6">-</td></tr>`;
       return `
       <div style="text-align:right;font-weight:700;font-size:9.5pt;margin-bottom:6pt">BENTUK KU-1</div>
       <div class="doc-title2" style="text-decoration:underline">SURAT KETERANGAN TANGGUNGAN KELUARGA</div>
@@ -1284,15 +1294,24 @@ function buildIsiForms() {
         </form>
       </div>
     </div>`).join('');
+
+  FILL_FORMS.forEach(f => {
+    f.fields.forEach(field => {
+      if (field.type === 'family-table') addFamRow(f.id, field.name);
+    });
+  });
 }
 
 function renderFillField(formId, field) {
   const fid = `${formId}__${field.name}`;
   const reqMark = field.required ? '<span class="req">*</span>' : '';
   const reqAttr = field.required ? 'required' : '';
-  const wrapWide = field.type === 'textarea' ? 'style="grid-column:1/-1"' : '';
+  const wrapWide = (field.type === 'textarea' || field.type === 'family-table') ? 'style="grid-column:1/-1"' : '';
   let control = '';
-  if (field.type === 'textarea') {
+  if (field.type === 'family-table') {
+    control = `<div class="fam-builder" id="${fid}_rows"></div>
+    <button type="button" class="fam-add-btn" onclick="addFamRow('${formId}','${field.name}')">➕ Tambah Anggota Keluarga</button>`;
+  } else if (field.type === 'textarea') {
     control = `<textarea id="${fid}" name="${field.name}" ${reqAttr}></textarea>`;
   } else if (field.type === 'select') {
     control = `<select id="${fid}" name="${field.name}" ${reqAttr}>
@@ -1307,6 +1326,93 @@ function renderFillField(formId, field) {
     ${control}
     ${field.hint ? `<div class="hint">${field.hint}</div>` : ''}
   </div>`;
+}
+
+// ─── FAMILY TABLE BUILDER (dipakai KU-1 dan formulir sejenis) ─────────────────
+function addFamRow(formId, fieldName) {
+  const container = document.getElementById(`${formId}__${fieldName}_rows`);
+  if (!container) return;
+  const row = document.createElement('div');
+  row.className = 'fam-row';
+  row.innerHTML = `
+    <div class="fam-row-grid">
+      <div class="fam-field"><label>Nama</label><input type="text" class="fam-nama" placeholder="Nama lengkap"></div>
+      <div class="fam-field"><label>Jenis Kelamin</label>
+        <select class="fam-lp">
+          <option value="">— Pilih —</option>
+          <option value="Laki-laki">Laki-laki</option>
+          <option value="Perempuan">Perempuan</option>
+        </select>
+      </div>
+      <div class="fam-field"><label>Tanggal Lahir</label><input type="date" class="fam-tgl"></div>
+      <div class="fam-field"><label>Hubungan Keluarga</label>
+        <select class="fam-hub">
+          <option value="">— Pilih —</option>
+          <option value="Istri">Istri</option>
+          <option value="Suami">Suami</option>
+          <option value="Anak Kandung">Anak Kandung</option>
+          <option value="Anak Tiri">Anak Tiri</option>
+          <option value="Anak Angkat">Anak Angkat</option>
+          <option value="Orang Tua Kandung">Orang Tua Kandung</option>
+          <option value="Mertua">Mertua</option>
+        </select>
+      </div>
+      <div class="fam-field"><label>Tempat Tinggal</label>
+        <select class="fam-tinggal-opt" onchange="toggleFamTinggal(this)">
+          <option value="sama">Sama dengan alamat di atas</option>
+          <option value="sendiri">Tulis sendiri</option>
+        </select>
+        <input type="text" class="fam-tinggal-custom" style="display:none;margin-top:6px" placeholder="Tulis alamat tempat tinggal">
+      </div>
+      <div class="fam-field"><label>Keterangan</label>
+        <select class="fam-ket">
+          <option value="BERHAK MENDAPAT TUNJANGAN">BERHAK MENDAPAT TUNJANGAN</option>
+          <option value="TIDAK BERHAK MENDAPAT TUNJANGAN">TIDAK BERHAK MENDAPAT TUNJANGAN</option>
+        </select>
+      </div>
+    </div>
+    <button type="button" class="fam-remove-btn" onclick="removeFamRow(this)">🗑️ Hapus Baris</button>`;
+  container.appendChild(row);
+}
+function removeFamRow(btn) {
+  const row = btn.closest('.fam-row');
+  const container = row.parentElement;
+  if (container.children.length > 1) {
+    row.remove();
+  } else {
+    alert('Minimal harus ada 1 baris anggota keluarga.');
+  }
+}
+function toggleFamTinggal(sel) {
+  const row = sel.closest('.fam-row');
+  const custom = row.querySelector('.fam-tinggal-custom');
+  if (sel.value === 'sendiri') {
+    custom.style.display = 'block';
+  } else {
+    custom.style.display = 'none';
+    custom.value = '';
+  }
+}
+function collectFamRows(formId, field) {
+  const container = document.getElementById(`${formId}__${field.name}_rows`);
+  if (!container) return [];
+  const rows = [...container.querySelectorAll('.fam-row')];
+  return rows.map(row => {
+    const nama = row.querySelector('.fam-nama').value.trim();
+    const lp = row.querySelector('.fam-lp').value;
+    const tgl = row.querySelector('.fam-tgl').value;
+    const hub = row.querySelector('.fam-hub').value;
+    const tinggalOpt = row.querySelector('.fam-tinggal-opt').value;
+    const ket = row.querySelector('.fam-ket').value;
+    let tinggal = '';
+    if (tinggalOpt === 'sama') {
+      const srcEl = document.getElementById(`${formId}__${field.sameAsField || 'alamat'}`);
+      tinggal = srcEl ? srcEl.value.trim() : '';
+    } else {
+      tinggal = row.querySelector('.fam-tinggal-custom').value.trim();
+    }
+    return {nama, lp, tgl, hub, tinggal, ket};
+  }).filter(r => r.nama);
 }
 
 function openFillPanel(id) {
@@ -1326,11 +1432,18 @@ function generateFilledPdf(evt, formId) {
 
   const data = {};
   def.fields.forEach(field => {
-    const el = document.getElementById(`${formId}__${field.name}`);
-    data[field.name] = el ? el.value.trim() : '';
+    if (field.type === 'family-table') {
+      data[field.name] = collectFamRows(formId, field);
+    } else {
+      const el = document.getElementById(`${formId}__${field.name}`);
+      data[field.name] = el ? el.value.trim() : '';
+    }
   });
 
-  const missing = def.fields.filter(f => f.required && !data[f.name]);
+  const missing = def.fields.filter(f => {
+    if (f.type === 'family-table') return f.required && (!data[f.name] || data[f.name].length === 0);
+    return f.required && !data[f.name];
+  });
   if (missing.length) {
     alert('Mohon lengkapi kolom wajib: ' + missing.map(f => f.label).join(', '));
     return false;
