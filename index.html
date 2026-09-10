@@ -778,8 +778,8 @@ const FILL_FORMS = [
           Disampaikan:<br>1. Lembar I untuk Bank / Giro<br>2. Lembar II untuk Kantor Cabang PT ASABRI (Persero)<br>3. Lembar III untuk penerima Pensiun
         </div>
         <div class="sign-col" style="text-align:center">
-          <div class="sign-name" style="margin-bottom:4pt">${dashIfEmpty(d.nama_penerima)}</div>
-          <div>( ${'.'.repeat(38)} )</div>
+          <div class="sign-space"></div>
+          <div class="sign-name">( ${dashIfEmpty(d.nama_penerima)} )</div>
         </div>
       </div>
       <div class="statement" style="margin-top:16pt">Dengan surat pernyataan ini dibuat, untuk dapat dipergunakan sebagaimana mestinya.</div>`
@@ -1047,8 +1047,8 @@ const FILL_FORMS = [
       <div class="sign-block">
         <div class="sign-col">
           <div>................., ${idDate(new Date().toISOString())}</div>
+          <div class="sign-jabatan">Lurah/Kepala Desa ${dashIfEmpty(d.wilayah_lurah)}</div>
           <div class="sign-space"></div>
-          <div class="sign-name">Lurah/Kepala Desa ${dashIfEmpty(d.wilayah_lurah)}</div>
           <div class="sign-name">( ${dashIfEmpty(d.nama_lurah)} )</div>
         </div>
       </div>`
@@ -1380,6 +1380,7 @@ function generateFilledPdf(evt, formId) {
     .sign-col{text-align:center;font-size:10pt;width:220pt;line-height:1.5}
     .sign-space{height:50pt}
     .sign-name{font-weight:700;text-decoration:underline}
+    .sign-jabatan{font-weight:700;margin-top:2pt}
     /* flat (borderless) label:value lines — dipakai form yang aslinya tidak bertabel */
     .flat-lines{margin:8pt 0}
     .flat-line{display:flex;font-size:10.5pt;line-height:1.75}
