@@ -1362,9 +1362,9 @@ function generateFilledPdf(evt, formId) {
     .statement{font-size:10.5pt;margin:10pt 0;text-align:justify;line-height:1.6}
     .numbered-table{width:100%;border-collapse:collapse;margin:6pt 0}
     .numbered-table td{padding:3pt 4pt;vertical-align:top;font-size:10pt}
-    .numbered-table .no{width:20pt;font-weight:600;color:#B87A10}
-    .numbered-table .lbl{width:190pt;font-weight:600;color:#0A1628}
-    .numbered-table .lbl.sub{padding-left:14pt;font-weight:500;color:#333}
+    .numbered-table .no{width:20pt;font-weight:400;color:#222}
+    .numbered-table .lbl{width:190pt;font-weight:400;color:#222}
+    .numbered-table .lbl.sub{padding-left:14pt;font-weight:400;color:#222}
     .numbered-table .colon{width:10pt}
     .numbered-table .val{color:#222}
     .legal-list{margin:8pt 0 8pt 20pt;font-size:9.8pt;line-height:1.55;text-align:justify}
@@ -1380,7 +1380,6 @@ function generateFilledPdf(evt, formId) {
     .sign-col{text-align:center;font-size:10pt;width:220pt;line-height:1.5}
     .sign-space{height:50pt}
     .sign-name{font-weight:700;text-decoration:underline}
-    .footer-note{margin-top:26pt;padding-top:8pt;border-top:0.5pt solid #ccc;display:flex;justify-content:space-between;font-size:8pt;color:#888}
     /* flat (borderless) label:value lines — dipakai form yang aslinya tidak bertabel */
     .flat-lines{margin:8pt 0}
     .flat-line{display:flex;font-size:10.5pt;line-height:1.75}
@@ -1406,16 +1405,13 @@ function generateFilledPdf(evt, formId) {
     .pf-row.pf-split .pf-box2label{width:70pt;flex-shrink:0;text-align:right;padding-right:4pt;color:#222}
     .pf-row.pf-split .pf-box2{flex:1}
     .pf-note{font-size:8.8pt;text-align:justify;margin-top:12pt;line-height:1.5}
+    @page{margin:0}
     @media print{body{padding:18pt 26pt}}
   </style>
   </head><body>
   ${def.boxed
     ? `<div class="page-boxed"><div class="kop-brand">${logoHtml}</div>${bodyHtml}</div>`
     : `<div class="kop-brand">${logoHtml}</div>${bodyHtml}`}
-  <div class="footer-note">
-    <span>Khirdin Satbrimob Polda Jateng</span>
-    <span>Dicetak: ${today}</span>
-  </div>
   <script>window.onload = () => window.print();<\/script>
   </body></html>`);
   win.document.close();
