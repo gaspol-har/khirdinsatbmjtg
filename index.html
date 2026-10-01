@@ -795,17 +795,13 @@ function IMG(src, x, top, w, h, nw, nh) {
 const SUP = (s) => `<span style="font-size:7pt;position:relative;top:-3.6pt;line-height:0">${s}</span>`;
 
 // ─── DAFTAR PANGKAT + GOLONGAN (satu dropdown: "BRIPDA / II A") ────────────────
-// Sumber: tabel dari pengguna (golongan tingkat I–IV). Sub-huruf (A/B/C/D) hanya ada untuk
-// Bripda (II A) dan Briptu (II B) karena terkonfirmasi di dokumen asli; sisanya belum ada sumbernya.
-const RANK_BASE = [
-  ['BHARADA','I'], ['BHARATU','I'], ['BHARAKA','I'], ['ABRIPDA','I'], ['ABRIPTU','I'], ['ABRIP','I'],
-  ['BRIPDA','II A'], ['BRIPTU','II B'], ['BRIGPOL','II'], ['BRIPKA','II'], ['AIPDA','II'], ['AIPTU','II'],
-  ['IPDA','III'], ['IPTU','III'], ['AKP','III'], ['KOMPOL','III'],
-  ['AKBP','IV'], ['KOMBES POL','IV']
+// Sumber: tabel resmi dari pengguna (golongan + huruf).
+const RANK_TABLE = [
+  ['BHARADA','I A'], ['BHARATU','I B'], ['BHARAKA','I C'], ['ABRIPDA','I D'], ['ABRIPTU','I E'], ['ABRIP','I F'],
+  ['BRIPDA','II A'], ['BRIPTU','II B'], ['BRIGPOL','II C'], ['BRIPKA','II D'], ['AIPDA','II E'], ['AIPTU','II F'],
+  ['IPDA','III A'], ['IPTU','III B'], ['AKP','III C'], ['KOMPOL','III D'],
+  ['AKBP','IV A'], ['KOMBES POL','IV B']
 ];
-// Pangkat yang hurufnya belum terverifikasi ditampilkan per huruf (A–D) agar tidak ada angka tebakan
-// yang tercetak diam-diam. Setelah tabel resmi diketahui, cukup sisakan satu baris per pangkat.
-const RANK_TABLE = RANK_BASE.flatMap(([p, g]) => /\s[A-D]$/.test(g) ? [[p, g]] : ['A', 'B', 'C', 'D'].map(l => [p, `${g} ${l}`]));
 // fmt: 'pg' → "BRIPTU / II B" | 'gol' → "BRIPTU / Gol. II B" | 'p' → "BRIPTU"
 function formatRank(val, fmt) {
   if (!val) return '';
