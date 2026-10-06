@@ -220,6 +220,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--light);color:va
       <button class="tab-pill" onclick="showTab('catur-sakti',this)">Catur Sakti Polda</button>
       <button class="tab-pill" onclick="showTab('warakawuri-polda',this)">Warakawuri Polda</button>
       <button class="tab-pill" onclick="showTab('warakawuri-asabri',this)">Warakawuri Asabri</button>
+      <button class="tab-pill" onclick="showTab('md-warakawuri',this)">MD + Warakawuri</button>
       <button class="tab-pill" onclick="showTab('tewas-polda',this)">Tewas Polda</button>
       <button class="tab-pill" onclick="showTab('tewas-asabri',this)">Tewas Asabri</button>
       <button class="tab-pill" onclick="showTab('pum-asabri',this)">PUM Asabri</button>
@@ -230,6 +231,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--light);color:va
     <div id="tab-catur-sakti" class="tab-content"></div>
     <div id="tab-warakawuri-polda" class="tab-content"></div>
     <div id="tab-warakawuri-asabri" class="tab-content"></div>
+    <div id="tab-md-warakawuri" class="tab-content"></div>
     <div id="tab-tewas-polda" class="tab-content"></div>
     <div id="tab-tewas-asabri" class="tab-content"></div>
     <div id="tab-pum-asabri" class="tab-content"></div>
@@ -369,6 +371,30 @@ const BERKAS = {
       'Suket Kuliah jika anak masih kuliah usia 21 tahun ke atas',
       'Form SP3R',
       'Surat Keterangan Kejandaan dari Kelurahan',
+      'Pas Foto 4×6 sebanyak 10 Lembar'
+    ]
+  },
+  'md-warakawuri': {
+    label: 'MD + Warakawuri Ceklis', color: 'teal', icon: '🗂️',
+    items: [
+      'Form Pengajuan',
+      'Form SP3R',
+      'Form TPB',
+      'SK Wari Salinan',
+      'SKPP dari KPPN',
+      'Asli RHS (Riwayat Hidup Singkat)',
+      'Asli Sket Ahli Waris (disahkan Lurah / Kepala Desa)',
+      'Asli Surat Keterangan Sekolah',
+      'Surat Keterangan Kejandaan dari Kelurahan',
+      'Suket Kuliah jika anak masih kuliah usia 21 tahun ke atas',
+      'FC Legalisir Kep PDH MD',
+      'FC Kep Pertama',
+      'FC Akta Kematian Legalisir Dukcapil',
+      'FC DPP Gaji KU-107',
+      'FC KTP / E-KTP',
+      'FC KK',
+      'FC Buku Nikah / Surat Nikah (Legalisir KUA / Dukcapil)',
+      'FC Buku Tabungan / Buku Rekening',
       'Pas Foto 4×6 sebanyak 10 Lembar'
     ]
   },
